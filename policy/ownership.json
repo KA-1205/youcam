@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "branches": {
+    "feature/catalog-stylist": [
+      "services/catalog/",
+      "services/recommendations/",
+      "services/stylist/"
+    ],
+    "feature/web-studio": [
+      "apps/web/src/",
+      "apps/web/tests/",
+      "apps/web/public/"
+    ],
+    "feature/platform-integrations": [
+      "apps/api/",
+      "apps/worker/",
+      "infra/migrations/"
+    ]
+  },
+  "integrationOwned": [
+    "contracts/",
+    "policy/",
+    "tools/",
+    "tests/",
+    ".github/",
+    "AGENTS.md",
+    "Makefile",
+    "package.json",
+    "package-lock.json",
+    "pyproject.toml",
+    "uv.lock",
+    "eslint.config.mjs",
+    "apps/web/package.json",
+    "apps/web/tsconfig.json",
+    "apps/web/next.config.ts",
+    "apps/web/next-env.d.ts",
+    "infra/compose.yaml",
+    "infra/backend.Dockerfile",
+    "infra/web.Dockerfile",
+    "tasks/",
+    ".npmrc"
+  ],
+  "protectedPrefixes": [
+    "reference/",
+    "docs/",
+    "specifications/",
+    "skills/original/"
+  ],
+  "protectedNames": [
+    "README.md",
+    "AGENTS_POLICY_TEMPLATE.md",
+    "ASTRA_3_ACCOUNT_RUNBOOK.md",
+    "GITHUB_SETUP.md",
+    "IMPLEMENTATION_PLAN.md",
+    "TICKETS.md",
+    "WORKSPACE_PROMPTS.md",
+    "Anchor-Fit-v3.3-Specifications.zip",
+    "prom.md",
+    "SKILLS.md"
+  ],
+  "integrationBranchPrefix": "integration/"
+}

@@ -1,0 +1,43 @@
+{
+  "sessionId": "00000000-0000-4000-8000-000000000001",
+  "tenantId": "demo-anchor-fit",
+  "sessionVersion": 1,
+  "consentRevision": 1,
+  "brief": {
+    "lookMode": "OUTFIT",
+    "outfitForm": "SEPARATES",
+    "requestedSlots": [
+      "TOP",
+      "BOTTOM",
+      "SHOES"
+    ],
+    "occasion": null,
+    "budgetMinor": 200000,
+    "currency": "INR",
+    "hardRequirements": {},
+    "preferences": {}
+  },
+  "anchors": [
+    {
+      "slot": "TOP",
+      "refType": "OWNED",
+      "refId": "owned-top-1"
+    }
+  ],
+  "locks": [
+    {
+      "slot": "TOP",
+      "refType": "OWNED",
+      "refId": "owned-top-1"
+    }
+  ],
+  "rejectedIds": [],
+  "selections": [
+    {
+      "slot": "TOP",
+      "refType": "OWNED",
+      "refId": "owned-top-1"
+    }
+  ],
+  "updatedAt": "2026-10-30T00:00:00Z"
+}

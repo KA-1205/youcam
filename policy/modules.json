@@ -1,0 +1,89 @@
+{
+  "tenant-access": {
+    "path": "apps/api/modules/tenant_access",
+    "owner": "C",
+    "depends": []
+  },
+  "catalog": {
+    "path": "services/catalog",
+    "owner": "A",
+    "depends": [
+      "tenant-access"
+    ]
+  },
+  "shopper-profile": {
+    "path": "apps/api/modules/shopper_profile",
+    "owner": "C",
+    "depends": [
+      "tenant-access",
+      "catalog"
+    ]
+  },
+  "styling-session": {
+    "path": "apps/api/modules/styling_session",
+    "owner": "C",
+    "depends": [
+      "catalog",
+      "shopper-profile"
+    ]
+  },
+  "recommendation-engine": {
+    "path": "services/recommendations",
+    "owner": "A",
+    "depends": [
+      "catalog",
+      "shopper-profile",
+      "styling-session"
+    ]
+  },
+  "try-on-jobs": {
+    "path": "apps/api/modules/try_on_jobs",
+    "owner": "C",
+    "depends": [
+      "tenant-access",
+      "catalog",
+      "shopper-profile",
+      "styling-session"
+    ]
+  },
+  "commerce": {
+    "path": "apps/api/modules/commerce",
+    "owner": "C",
+    "depends": [
+      "catalog",
+      "styling-session",
+      "shopper-profile",
+      "tenant-access"
+    ]
+  },
+  "shopper-studio": {
+    "path": "apps/web/src",
+    "owner": "B",
+    "depends": [
+      "styling-session",
+      "recommendation-engine",
+      "try-on-jobs",
+      "commerce"
+    ]
+  },
+  "stylist-review": {
+    "path": "services/stylist",
+    "owner": "A",
+    "depends": [
+      "styling-session",
+      "tenant-access",
+      "catalog",
+      "recommendation-engine"
+    ]
+  },
+  "merchant-insights": {
+    "path": "apps/api/modules/merchant_insights",
+    "owner": "C",
+    "depends": [
+      "styling-session",
+      "try-on-jobs",
+      "stylist-review",
+      "commerce"
+    ]
+  }
+}

@@ -1,0 +1,252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Anchor Fit stylist model output v1",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "LOOKS"
+        },
+        "looks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "slot": {
+                      "enum": [
+                        "TOP",
+                        "BOTTOM",
+                        "ONE_PIECE",
+                        "SHOES",
+                        "OUTER",
+                        "EARRINGS",
+                        "NECKLACE",
+                        "RING",
+                        "BRACELET",
+                        "WATCH",
+                        "FOUNDATION",
+                        "LIP",
+                        "BLUSH"
+                      ]
+                    },
+                    "refType": {
+                      "enum": [
+                        "VARIANT",
+                        "OWNED"
+                      ]
+                    },
+                    "refId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    }
+                  },
+                  "required": [
+                    "slot",
+                    "refType",
+                    "refId"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1,
+                "maxItems": 13
+              },
+              "reasons": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 600
+                    },
+                    "evidenceIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "minItems": 1,
+                      "maxItems": 10
+                    },
+                    "kind": {
+                      "enum": [
+                        "CATALOG_FACT",
+                        "EXPLICIT_PREFERENCE",
+                        "SUBJECTIVE_OBSERVATION"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "text",
+                    "evidenceIds",
+                    "kind"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1,
+                "maxItems": 8
+              },
+              "warnings": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600
+                },
+                "maxItems": 8
+              }
+            },
+            "required": [
+              "items",
+              "reasons",
+              "warnings"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 3
+        }
+      },
+      "required": [
+        "kind",
+        "looks"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "REVIEW"
+        },
+        "lookId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 600
+              },
+              "evidenceIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "minItems": 1,
+                "maxItems": 10
+              },
+              "kind": {
+                "enum": [
+                  "CATALOG_FACT",
+                  "EXPLICIT_PREFERENCE",
+                  "SUBJECTIVE_OBSERVATION"
+                ]
+              }
+            },
+            "required": [
+              "text",
+              "evidenceIds",
+              "kind"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "replacements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "slot": {
+                "enum": [
+                  "TOP",
+                  "BOTTOM",
+                  "ONE_PIECE",
+                  "SHOES",
+                  "OUTER",
+                  "EARRINGS",
+                  "NECKLACE",
+                  "RING",
+                  "BRACELET",
+                  "WATCH",
+                  "FOUNDATION",
+                  "LIP",
+                  "BLUSH"
+                ]
+              },
+              "refType": {
+                "enum": [
+                  "VARIANT",
+                  "OWNED"
+                ]
+              },
+              "refId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "slot",
+              "refType",
+              "refId"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 13
+        }
+      },
+      "required": [
+        "kind",
+        "lookId",
+        "observations",
+        "replacements"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "NEEDS_CLARIFICATION"
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "reason": {
+          "enum": [
+            "MISSING_REQUIRED_INPUT",
+            "INSUFFICIENT_EVIDENCE"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "question",
+        "reason"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "anchor-fit",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/web"
+  ],
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "build": "npm run build --workspace @anchor-fit/web",
+    "typecheck": "npm run typecheck --workspace @anchor-fit/web",
+    "lint": "eslint apps/web/src apps/web/tests contracts/runtime/client.ts",
+    "test": "node --import tsx --test apps/web/tests/*.test.ts",
+    "contracts:generate": "openapi-typescript contracts/runtime/openapi.json -o contracts/runtime/client.ts",
+    "dev": "npm run dev --workspace @anchor-fit/web"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3",
+    "tsx": "4.23.15",
+    "eslint": "10.13.0",
+    "typescript-eslint": "8.72.1",
+    "@eslint/js": "10.0.1",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0"
+  },
+  "packageManager": "npm@11.9.0"
+}

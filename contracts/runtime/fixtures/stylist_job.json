@@ -1,0 +1,15 @@
+{
+  "jobId": "00000000-0000-4000-8000-000000000002",
+  "sessionId": "00000000-0000-4000-8000-000000000001",
+  "sessionVersion": 1,
+  "catalogVersion": "fixture-v1",
+  "policyVersion": "stylist-v1",
+  "status": "QUEUED",
+  "freshness": "CURRENT",
+  "source": null,
+  "createdAt": "2026-10-30T00:00:00Z",
+  "updatedAt": "2026-10-30T00:00:00Z",
+  "result": null,
+  "error": null,
+  "requestId": "00000000-0000-4000-8000-000000000003"
+}

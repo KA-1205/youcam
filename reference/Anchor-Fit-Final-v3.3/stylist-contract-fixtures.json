@@ -1,0 +1,117 @@
+{
+  "schemaValid": [
+    {
+      "kind": "LOOKS",
+      "looks": [
+        {
+          "items": [
+            {
+              "slot": "TOP",
+              "refType": "OWNED",
+              "refId": "owned-top-1"
+            },
+            {
+              "slot": "BOTTOM",
+              "refType": "VARIANT",
+              "refId": "variant-bottom-1"
+            },
+            {
+              "slot": "SHOES",
+              "refType": "VARIANT",
+              "refId": "variant-shoes-1"
+            }
+          ],
+          "reasons": [
+            {
+              "text": "Uses your confirmed owned top.",
+              "evidenceIds": [
+                "owned-top-1"
+              ],
+              "kind": "CATALOG_FACT"
+            }
+          ],
+          "warnings": []
+        }
+      ]
+    },
+    {
+      "kind": "NEEDS_CLARIFICATION",
+      "question": "Would you like separates or a one-piece outfit?",
+      "reason": "MISSING_REQUIRED_INPUT"
+    }
+  ],
+  "schemaInvalid": [
+    {
+      "kind": "LOOKS",
+      "looks": [
+        {
+          "items": [
+            {
+              "slot": "TOP",
+              "refType": "OWNED",
+              "refId": "owned-top-1"
+            },
+            {
+              "slot": "BOTTOM",
+              "refType": "VARIANT",
+              "refId": "variant-bottom-1"
+            },
+            {
+              "slot": "SHOES",
+              "refType": "VARIANT",
+              "refId": "variant-shoes-1"
+            }
+          ],
+          "reasons": [
+            {
+              "text": "Uses your confirmed owned top.",
+              "evidenceIds": [
+                "owned-top-1"
+              ],
+              "kind": "CATALOG_FACT"
+            }
+          ],
+          "warnings": []
+        }
+      ],
+      "inventedTotal": 123
+    },
+    {
+      "kind": "NO_ELIGIBLE_COMBINATION"
+    },
+    {
+      "kind": "LOOKS",
+      "looks": []
+    }
+  ],
+  "semanticCases": [
+    {
+      "case": "nonexistent-ID",
+      "expected": "REJECT_CANDIDATE"
+    },
+    {
+      "case": "cross-tenant-ID",
+      "expected": "REJECT_CANDIDATE"
+    },
+    {
+      "case": "three-TOP-items-for-SEPARATES",
+      "expected": "REJECT_COVERAGE"
+    },
+    {
+      "case": "same-product-different-size",
+      "expected": "DEDUPLICATE"
+    },
+    {
+      "case": "unknown-price-under-hard-budget",
+      "expected": "EXCLUDE_NEW_CANDIDATE"
+    },
+    {
+      "case": "model-failure",
+      "expected": "LABELLED_RULE_BASED_FALLBACK"
+    },
+    {
+      "case": "stale-session",
+      "expected": "SUPERSEDED_NO_AUTO_APPLY"
+    }
+  ]
+}
