@@ -15,6 +15,9 @@ from apps.api.modules.commerce.models import OrderRow, OutboxEventRow
 from apps.api.modules.commerce.ports import DemoPaymentPort
 from apps.api.modules.commerce.service import CommerceService
 from apps.api.modules.shopper_profile.service import ProfileService
+from apps.api.modules.storage.backend import StorageBackend, create_backend
+from apps.api.modules.storage.models import AssetRow
+from apps.api.modules.storage.service import StorageService
 from apps.api.modules.styling_session.service import SessionService
 from apps.api.modules.task_runtime.models import DurableTaskRow
 from apps.api.modules.task_runtime.service import TaskService
@@ -34,6 +37,8 @@ class Runtime:
     tasks: TaskService
     payment: DemoPaymentPort
     commerce: CommerceService
+    storage: StorageService
+    storage_backend: StorageBackend
     worker_id: str
 
     def cycle(self, max_tasks: int = 10) -> dict:
@@ -43,6 +48,7 @@ class Runtime:
         with self.database.unit_of_work() as db:
             summary['reclaimedLeases'] = self.tasks.reclaim_expired_leases(db, _now())
             summary['reconciledTimeouts'] = self._reconcile_timeouts(db)
+            summary['expiredAssets'] = self.storage.sweep_expired(db)
         for _ in range(max_tasks):
             outcome = self._run_one()
             if outcome is None:
@@ -74,6 +80,8 @@ class Runtime:
     def _dispatch(self, db: Session, operation: str, resource_id: str, context: dict) -> None:
         if operation == 'COMMERCE_EVENT':
             self._publish_commerce_event(db, resource_id, context)
+        elif operation == 'ASSET_DELETE':
+            self._purge_asset(db, resource_id)
         elif operation == 'STYLIST':
             raise ApiError(503, 'STYLIST_UNAVAILABLE',
                            'The stylist lane is not integrated on this branch.')
@@ -96,6 +104,17 @@ class Runtime:
         self.profile.consume_commerce_event(db, account_id, event)
         row.status = OUTBOX_TTL_MARK
         row.published_at = _now()
+
+    def _purge_asset(self, db: Session, asset_id: str) -> None:
+        """Worker-driven hard deletion: removes bytes and tombstones the row."""
+        row = db.get(AssetRow, asset_id)
+        if row is None:
+            return
+        self.storage_backend.delete(row.storage_key)
+        if row.status != 'REVOKED':
+            row.status = 'REVOKED'
+            row.deleted_at = _now()
+            row.updated_at = _now()
 
     def _reconcile_timeouts(self, db: Session) -> int:
         rows = db.scalars(select(OrderRow).where(OrderRow.status == 'PAYMENT_PENDING')).all()
@@ -133,8 +152,11 @@ def build_runtime(database: Database) -> Runtime:
     tasks = TaskService()
     payment = DemoPaymentPort()
     commerce = CommerceService(payment, catalog, sessions.assert_editable, tasks.enqueue_direct)
+    storage_backend = create_backend()
+    storage = StorageService(storage_backend, lambda db, actor: profile.consent_snapshot(db, actor))
     return Runtime(database=database, catalog=catalog, access=AccessService(), profile=profile,
                    sessions=sessions, tasks=tasks, payment=payment, commerce=commerce,
+                   storage=storage, storage_backend=storage_backend,
                    worker_id=os.getenv('WORKER_ID', f'worker-{socket.gethostname()}'))
 
 

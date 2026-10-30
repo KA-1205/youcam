@@ -22,6 +22,8 @@ from apps.api.errors import ApiError
 from apps.api.modules.commerce.ports import DemoPaymentPort
 from apps.api.modules.commerce.service import CommerceService, replay, store
 from apps.api.modules.shopper_profile.service import ProfileService
+from apps.api.modules.storage.backend import create_backend
+from apps.api.modules.storage.service import StorageService
 from apps.api.modules.styling_session.service import SessionService
 from apps.api.modules.task_runtime.service import TaskService
 from apps.api.modules.tenant_access.models import Account as AccessAccount
@@ -55,6 +57,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
     payment_port = DemoPaymentPort()
     commerce_service = CommerceService(payment_port, catalog, session_service.assert_editable,
                                        task_service.enqueue_direct)
+    storage_service = StorageService(create_backend(), profile_service.consent_snapshot)
 
     def ctx_of(db: Session, identity: Identity) -> m.AccessContext:
         revision = profile_service.latest_revision(db, identity.actor_id)
@@ -216,6 +219,29 @@ def create_app(database_url: str | None = None) -> FastAPI:
                            lambda: commerce_service.receive_return(db, ctx_of(db, identity),
                                                                    orderId, body))
 
+    def prepare_asset_upload(body: m.AssetUploadRequest,
+                             idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                             identity: Identity = Depends(get_identity),
+                             db: Session = Depends(get_db)) -> m.AssetDescriptor:
+        return _idempotent(db, identity, 'prepareAssetUpload', idempotency_key, body,
+                           lambda: storage_service.prepare_upload(db, ctx_of(db, identity), body))
+
+    def get_asset(assetId: UUID, identity: Identity = Depends(get_identity),
+                  db: Session = Depends(get_db)) -> m.AssetDescriptor:
+        return storage_service.get_asset(db, ctx_of(db, identity), str(assetId))
+
+    def delete_asset(assetId: UUID, identity: Identity = Depends(get_identity),
+                     db: Session = Depends(get_db)) -> m.Ack:
+        return storage_service.delete_asset(db, ctx_of(db, identity), str(assetId))
+
+    def save_asset(assetId: UUID, body: m.SaveAsset,
+                   idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                   identity: Identity = Depends(get_identity),
+                   db: Session = Depends(get_db)) -> m.AssetDescriptor:
+        return _idempotent(db, identity, 'saveAsset', idempotency_key, body,
+                           lambda: storage_service.save_asset(db, ctx_of(db, identity),
+                                                              str(assetId), body))
+
     HANDLERS: dict[str, Any] = {
         'getProfile': get_profile,
         'updateConsent': update_consent,
@@ -232,6 +258,10 @@ def create_app(database_url: str | None = None) -> FastAPI:
         'requestReturn': request_return,
         'advanceFulfilment': advance_fulfilment,
         'receiveReturn': receive_return,
+        'prepareAssetUpload': prepare_asset_upload,
+        'getAsset': get_asset,
+        'deleteAsset': delete_asset,
+        'saveAsset': save_asset,
     }
 
     @app.middleware('http')
@@ -300,6 +330,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
     app.state.session_service = session_service
     app.state.profile_service = profile_service
     app.state.task_service = task_service
+    app.state.storage_service = storage_service
     return app
 
 
