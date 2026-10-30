@@ -1,0 +1,106 @@
+name: Anchor Fit CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, 'feature/**']
+
+permissions:
+  contents: read
+
+jobs:
+  policy:
+    name: policy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate protected files and branch ownership
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          python3 - <<'PY'
+          import os, subprocess, sys
+          def git(*args):
+              return subprocess.check_output(["git", *args], text=True).strip()
+          # Pull requests are compared to the target branch, not an arbitrary older SHA.
+          if os.environ["EVENT_NAME"] == "pull_request":
+              base = "origin/" + os.environ.get("BASE_REF", "main")
+              before = git("merge-base", "HEAD", base)
+              branch = os.environ.get("HEAD_REF", "")
+          else:
+              before = git("rev-parse", "HEAD^") if git("rev-list", "--count", "HEAD") != "1" else ""
+              branch = os.environ.get("GITHUB_REF_NAME", "")
+          changed = git("diff", "--name-only", before, "HEAD").splitlines() if before else []
+          forbidden = [p for p in changed if p.startswith(("specifications/", "docs/", "skills/original/"))]
+          if forbidden:
+              print("Protected reference paths changed:", forbidden)
+              sys.exit(1)
+          # Lane boundaries are strict on PRs from the three named development branches.
+          lanes = {
+              "feature/catalog-stylist": ("services/catalog/", "services/recommendations/", "services/stylist/"),
+              "feature/web-studio": ("apps/web/src/", "apps/web/tests/", "apps/web/public/"),
+              "feature/platform-integrations": ("apps/api/", "apps/worker/", "infra/migrations/"),
+          }
+          if os.environ["EVENT_NAME"] == "pull_request" and branch in lanes:
+              illegal = [p for p in changed if not p.startswith(lanes[branch])]
+              if illegal:
+                  print("Files outside assigned ownership:", illegal)
+                  sys.exit(1)
+          print("Policy check passed. Changed files:", len(changed))
+          PY
+  frontend:
+    name: frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Frontend checks when app exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -f apps/web/package.json ]]; then
+            echo "Frontend is not scaffolded yet; no frontend tests executed"
+            exit 0
+          fi
+          cd apps/web
+          if [[ -f package-lock.json ]]; then npm ci; else echo "Missing frontend package-lock.json"; exit 1; fi
+          npm run lint --if-present
+          npm run typecheck --if-present
+          npm test --if-present -- --runInBand
+          npm run build --if-present
+  backend:
+    name: backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Backend checks when app exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -d apps/api ]]; then
+            echo "Backend is not scaffolded yet; no backend tests executed"
+            exit 0
+          fi
+          if [[ -f apps/api/requirements-dev.txt ]]; then
+            python -m pip install -r apps/api/requirements-dev.txt
+          elif [[ -f apps/api/requirements.txt ]]; then
+            python -m pip install -r apps/api/requirements.txt
+          else
+            echo "Backend dependencies missing"; exit 1
+          fi
+          if [[ -d apps/api/tests ]]; then
+            python -m pip install pytest
+            python -m pytest apps/api/tests -q
+          else
+            echo "Backend tests missing"; exit 1
+          fi
