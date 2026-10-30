@@ -204,7 +204,8 @@ class ProfileService:
         fingerprint = hashlib.sha256(json.dumps(
             {'order': str(event.orderId), 'version': event.orderVersion, 'type': event.type,
              'mode': event.mode,
-             'lines': [[line.orderLineId, line.variantId, line.quantity] for line in event.lines]},
+             'lines': [[str(line.orderLineId), line.variantId, line.quantity]
+                       for line in event.lines]},
             sort_keys=True).encode()).hexdigest()
         existing = db.get(CommerceEventRecord, str(event.eventId))
         if existing is not None:

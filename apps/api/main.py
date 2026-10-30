@@ -23,6 +23,7 @@ from apps.api.modules.commerce.ports import DemoPaymentPort
 from apps.api.modules.commerce.service import CommerceService, replay, store
 from apps.api.modules.shopper_profile.service import ProfileService
 from apps.api.modules.styling_session.service import SessionService
+from apps.api.modules.task_runtime.service import TaskService
 from apps.api.modules.tenant_access.models import Account as AccessAccount
 from apps.api.modules.tenant_access.service import (
     COOKIE_NAME,
@@ -50,8 +51,10 @@ def create_app(database_url: str | None = None) -> FastAPI:
     access_service = AccessService()
     profile_service = ProfileService(resolve_slot=catalog.slot_for)
     session_service = SessionService(catalog)
+    task_service = TaskService()
     payment_port = DemoPaymentPort()
-    commerce_service = CommerceService(payment_port, catalog, session_service.assert_editable)
+    commerce_service = CommerceService(payment_port, catalog, session_service.assert_editable,
+                                       task_service.enqueue_direct)
 
     def ctx_of(db: Session, identity: Identity) -> m.AccessContext:
         revision = profile_service.latest_revision(db, identity.actor_id)
@@ -296,6 +299,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
     app.state.commerce_service = commerce_service
     app.state.session_service = session_service
     app.state.profile_service = profile_service
+    app.state.task_service = task_service
     return app
 
 

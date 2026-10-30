@@ -63,13 +63,15 @@ EventTypes = Literal['ORDERED', 'DELIVERED', 'CANCELLED', 'REFUNDED', 'RETURN_RE
 def order_snapshot(row: OrderRow) -> OrderSnapshot:
     return OrderSnapshot(orderId=UUID(row.order_id), tenantId=row.tenant_id,
                          orderVersion=row.order_version, status=cast(OrderStatus, row.status),
-                         lines=[CartLine(**line) for line in row.lines],
+                         lines=[CartLine(variantId=line['variantId'], quantity=line['quantity'])
+                                for line in row.lines],
                          totalMinor=row.total_minor, currency=row.currency, mode='DEMO',
                          returnStatus=cast(Literal['NONE', 'REQUESTED', 'RECEIVED'],
                                            row.return_status))
 
 
 SessionGuard = Callable[[Session, AccessContext, UUID, int], None]
+TaskEnqueue = Callable[..., object]
 
 
 class CommerceService:
@@ -80,10 +82,12 @@ class CommerceService:
     """
 
     def __init__(self, payment: DemoPaymentPort, catalog,
-                 session_guard: SessionGuard | None = None) -> None:
+                 session_guard: SessionGuard | None = None,
+                 task_enqueue: TaskEnqueue | None = None) -> None:
         self._payment = payment
         self._catalog = catalog
         self._session_guard = session_guard
+        self._task_enqueue = task_enqueue
 
     def warehouse(self, db: Session, tenant_id: str) -> DemoWarehousePort:
         from apps.api.demo_catalog import FixtureCatalog
@@ -157,7 +161,9 @@ class CommerceService:
 
         order = OrderRow(order_id=str(uuid4()), tenant_id=quote.tenant_id, actor_id=ctx.actorId,
                          account_id=account_id, order_version=1, event_sequence=0,
-                         status='PAYMENT_PENDING', lines=quote.lines,
+                         status='PAYMENT_PENDING',
+                         lines=[{'orderLineId': str(uuid4()), 'variantId': line['variantId'],
+                                 'quantity': line['quantity']} for line in quote.lines],
                          total_minor=quote.total_minor, currency=quote.currency, mode='DEMO',
                          return_status='NONE', quote_id=quote.quote_id,
                          reservation_id=str(reservation.reservationId),
@@ -324,8 +330,9 @@ class CommerceService:
             eventId=uuid4(), tenantId=order.tenant_id, orderId=UUID(order.order_id),
             orderVersion=order.event_sequence, type=event_type, occurredAt=clock.now(),
             mode='DEMO',
-            lines=[CommerceLine(orderLineId=uuid4(), variantId=line['variantId'],
-                                quantity=line['quantity']) for line in order.lines])
+            lines=[CommerceLine(orderLineId=UUID(line['orderLineId']),
+                                variantId=line['variantId'], quantity=line['quantity'])
+                   for line in order.lines])
         payload = event.model_dump(mode='json')
         if extra:
             payload['extra'] = extra
@@ -333,6 +340,12 @@ class CommerceService:
                               order_id=order.order_id, event_sequence=order.event_sequence,
                               payload=payload, status='PENDING', created_at=clock.now(),
                               published_at=None))
+        if self._task_enqueue is not None:
+            self._task_enqueue(db, order.tenant_id, order.actor_id, 'COMMERCE_EVENT',
+                               UUID(str(event.eventId)),
+                               hashlib.sha256(json.dumps(payload, sort_keys=True).encode())
+                               .hexdigest(), UUID(str(event.eventId)),
+                               context={'account_id': order.account_id})
         db.flush()
 
     def _owned_order(self, db: Session, ctx: AccessContext, order_id: UUID) -> OrderRow:
