@@ -9,8 +9,10 @@ from uuid import UUID
 
 from .models import (
     AccessContext,
+    Brief,
     CartLine,
     CatalogPage,
+    CatalogQuery,
     CatalogSnapshot,
     CommerceEvent,
     DurableTask,
@@ -28,7 +30,7 @@ from .models import (
 
 
 class CatalogPort(Protocol):
-    def list_variants(self, ctx: AccessContext, cursor: str | None, limit: int) -> CatalogPage: ...
+    def list_variants(self, ctx: AccessContext, cursor: str | None, limit: int, query: CatalogQuery | None = None) -> CatalogPage: ...
     def snapshot(self, ctx: AccessContext, variant_ids: list[str]) -> CatalogSnapshot: ...
 
 
@@ -40,7 +42,8 @@ class ProfilePort(Protocol):
 class SessionPort(Protocol):
     def snapshot(self, ctx: AccessContext, session_id: UUID) -> SessionSnapshot: ...
     def apply(self, ctx: AccessContext, session_id: UUID, expected_version: int,
-              selections: list[ItemRef], approved_exception_ids: list[UUID]) -> SessionSnapshot: ...
+              selections: list[ItemRef], approved_exception_ids: list[UUID],
+              approved_brief: Brief | None = None) -> SessionSnapshot: ...
 
 
 class RecommendationPort(Protocol):
