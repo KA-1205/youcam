@@ -46,17 +46,17 @@ def test_invalid_commit_subject(message):
 
 
 def test_github_merge_commit_on_main_allowed():
-    message = ('Merge pull request #2 from KA-1205/integration/contract-remediation\\n\\n'
+    message = ('Merge pull request #2 from KA-1205/integration/contract-remediation\n\n'
                'Extend catalog and session contracts')
     assert not commit_message_errors(message, 'main', 2)
 
 
 @pytest.mark.parametrize('branch,parents,message', [
-    ('feature/catalog-stylist', 2, 'Merge pull request #2 from KA-1205/feature/a\\n\\nFix'),
-    ('main', 1, 'Merge pull request #2 from KA-1205/feature/a\\n\\nFix'),
-    ('main', 2, 'Merge pull request #2 from KA-1205/feature/a\\n\\nFix\\nCo-authored-by: X'),
-    ('main', 2, 'Merge pull request #2 from KA-1205/feature/a\\n\\nFix\\nMore text'),
-    ('main', 2, 'Merge something unsafe\\n\\nFix'),
+    ('feature/catalog-stylist', 2, 'Merge pull request #2 from KA-1205/feature/a\n\nFix'),
+    ('main', 1, 'Merge pull request #2 from KA-1205/feature/a\n\nFix'),
+    ('main', 2, 'Merge pull request #2 from KA-1205/feature/a\n\nFix\nCo-authored-by: X'),
+    ('main', 2, 'Merge pull request #2 from KA-1205/feature/a\n\nFix\nMore text'),
+    ('main', 2, 'Merge something unsafe\n\nFix'),
 ])
 def test_nonstandard_merge_commit_still_rejected(branch, parents, message):
     assert commit_message_errors(message, branch, parents)
