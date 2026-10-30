@@ -62,7 +62,7 @@ def commit_message_errors(message: str, branch: str, parent_count: int) -> list[
     if branch == 'main' and parent_count == 2:
         match = re.fullmatch(
             r'Merge pull request #[1-9][0-9]* from [A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+'
-            r'\\n\\n([^\\n]{1,100})\\n*',
+            r'\n\n([^\n]{1,100})\n*',
             message,
         )
         if match and not re.search(r'(?i)co-authored|generated.by', match.group(1)):
