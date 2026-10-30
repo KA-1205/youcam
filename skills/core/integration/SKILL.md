@@ -1,0 +1,5 @@
+---
+name: anchor-fit-integrationdescription: Safely merge three isolated branches into a tested runnable application.
+---
+# Sequential integration — coordinator only
+Confirm that all lane PRs satisfy their tickets, that shared contracts remain frozen and every changed file has an owner. Merge platform, AI and web PRs one at a time, adjusting only if dependencies require. After each merge, run CI and relevant smoke tests; stop on any failure. Integration fixes belong in a separate integration branch with review, not undocumented direct pushes to main. After final merge run database migrations in a clean environment, API and worker tests, UI browser E2E and the principal shopper/merchant/try-on flow. Report blocked live tests, missing keys and deferred features explicitly. Do not merge the docs branch.
