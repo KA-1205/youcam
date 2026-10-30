@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AppShell } from "../components/app-shell";
 import { SessionProvider } from "../lib/session-context";
+import { ShortlistProvider } from "../lib/shortlist-context";
 
 export const metadata: Metadata = {
   title: "Anchor Fit",
@@ -13,7 +14,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         <SessionProvider>
-          <AppShell>{children}</AppShell>
+          <ShortlistProvider>
+            <AppShell>{children}</AppShell>
+          </ShortlistProvider>
         </SessionProvider>
       </body>
     </html>
