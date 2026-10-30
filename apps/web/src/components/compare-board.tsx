@@ -58,7 +58,7 @@ export function CompareBoard({ looks }: { looks: Look[] }) {
         <tbody>
           {slots.map((slot) => (
             <tr key={slot}>
-              <th scope="row">{slot.replace("_", " ").toLowerCase()}</th>
+              <th scope="row">{slot.replaceAll("_", " ").toLowerCase()}</th>
               {looks.map((look) => {
                 const ref = look.items.find((i) => i.slot === slot);
                 if (!ref)

@@ -36,7 +36,7 @@ export function WardrobeList({ items }: { items: WardrobeItem[] }) {
           <li key={item.wardrobeId}>
             <div className="item-row">
               <div>
-                <strong>{view ? `${view.brandName} ${view.slot.replace("_", " ").toLowerCase()}` : item.reference.refId}</strong>{" "}
+                <strong>{view ? `${view.brandName} ${view.slot.replaceAll("_", " ").toLowerCase()}` : item.reference.refId}</strong>{" "}
                 <span className={state === "owned" ? "chip chip--ok" : "chip"}>{state}</span>
                 {view && view.priceMinor !== null ? (
                   <span className="muted"> — {formatMinor(view.priceMinor, view.currency)}</span>

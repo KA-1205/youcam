@@ -237,7 +237,7 @@ export default function PreviewPage() {
                     className={preview.capability === tab ? "tab tab--active" : "tab"}
                     onClick={() => dispatch({ type: "SET_CAPABILITY", capability: tab })}
                   >
-                    {tab.replace("_", " ").toLowerCase()}
+                    {tab.replaceAll("_", " ").toLowerCase()}
                     {capability && capability.state !== "VERIFIED" ? " *" : ""}
                   </button>
                 );
@@ -263,7 +263,7 @@ export default function PreviewPage() {
                             checked={preview.selections.includes(v.variantId)}
                             onChange={() => dispatch({ type: "TOGGLE_SELECTION", refId: v.variantId })}
                           />{" "}
-                          {v.brandName} {v.slot.replace("_", " ").toLowerCase()} —{" "}
+                          {v.brandName} {v.slot.replaceAll("_", " ").toLowerCase()} —{" "}
                           {v.priceMinor === null ? "Price unknown" : `${Math.round(v.priceMinor / 100)} ₹`}
                         </label>
                       </span>

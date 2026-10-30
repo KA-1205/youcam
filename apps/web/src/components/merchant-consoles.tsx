@@ -59,12 +59,12 @@ export function MerchantConsoles({
           {capabilities.map((c) => (
             <li key={c.capability}>
               <div className="item-row">
-                <span>{c.capability.replace("_", " ").toLowerCase()}</span>
+                <span>{c.capability.replaceAll("_", " ").toLowerCase()}</span>
                 <span>
                   {c.state === "VERIFIED" ? (
                     <span className="chip chip--ok">verified</span>
                   ) : (
-                    <span className="chip chip--warn">{c.state.replace("_", " ").toLowerCase()} — live previews unavailable</span>
+                    <span className="chip chip--warn">{c.state.replaceAll("_", " ").toLowerCase()} — live previews unavailable</span>
                   )}
                 </span>
               </div>

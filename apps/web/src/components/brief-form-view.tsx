@@ -21,6 +21,8 @@ const ANCHOR_CHOICES = VARIANTS.filter(
 ).filter((v) => v.priceMinor !== null && v.stock !== null && v.stock > 0);
 
 const FLOW_LINKS = [
+  { href: "/inspiration", label: "Inspiration" },
+  { href: "/consultations", label: "Consultations" },
   { href: "/compare", label: "Compare looks" },
   { href: "/preview", label: "Photo previews" },
   { href: "/beauty", label: "Beauty and jewellery" },
@@ -202,7 +204,7 @@ export function BriefFormView({ onComplete }: { onComplete: () => void }) {
                   checked={form.requestedSlots.includes(slot)}
                   onChange={() => toggleSlot(slot)}
                 />{" "}
-                {slot.replace("_", " ").toLowerCase()}
+                {slot.replaceAll("_", " ").toLowerCase()}
               </label>
             ))}
           </div>

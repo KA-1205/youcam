@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { href: "/preview", label: "Preview" },
   { href: "/beauty", label: "Beauty" },
   { href: "/wardrobe", label: "Wardrobe" },
+  { href: "/inspiration", label: "Inspiration" },
   { href: "/stylist", label: "Stylist" },
   { href: "/merchant", label: "Merchant" },
 ];

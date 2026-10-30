@@ -64,7 +64,7 @@ export default function StudioPage() {
             <h2>Anchor &amp; constraints</h2>
             <p>
               {MODE_LABEL[brief.lookMode] ?? brief.lookMode}
-              {brief.outfitForm ? ` — ${brief.outfitForm.replace("_", " ").toLowerCase()}` : ""}
+              {brief.outfitForm ? ` — ${brief.outfitForm.replaceAll("_", " ").toLowerCase()}` : ""}
             </p>
             <p className="footnote">Requested: {brief.requestedSlots.join(", ") || "none"}</p>
             <p className="footnote">
@@ -125,7 +125,7 @@ export default function StudioPage() {
           {result?.kind === "NO_ELIGIBLE_COMBINATION" ? (
             <section className="card">
               <h2>No combination fits</h2>
-              <p>Proof: {result.proofCode.replace("_", " ").toLowerCase()}.</p>
+              <p>Proof: {result.proofCode.replaceAll("_", " ").toLowerCase()}.</p>
               <ul>
                 {result.constraintEvidence.map((e) => (
                   <li key={e}>{e}</li>

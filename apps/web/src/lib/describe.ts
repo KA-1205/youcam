@@ -20,7 +20,7 @@ export type ItemView = {
 function humanize(productId: string): string {
   const withoutPrefix = productId.replace(/^product-/, "");
   const slot = withoutPrefix.replace(/-\d+$/, "");
-  const words = slot.replace("_", " ").toLowerCase();
+  const words = slot.replaceAll("_", " ").toLowerCase();
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 

@@ -211,7 +211,7 @@ export function StylistConsoles() {
                       )
                     }
                   />{" "}
-                  Approve exception ({e.kind.replace("_", " ").toLowerCase()}): {e.description}
+                  Approve exception ({e.kind.replaceAll("_", " ").toLowerCase()}): {e.description}
                 </label>
               </span>
             </div>

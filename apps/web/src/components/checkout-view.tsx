@@ -51,24 +51,20 @@ export function CheckoutView({ onOrderPlaced }: { onOrderPlaced: (orderId: strin
     });
     if (result.data) setQuote(result.data);
     else setError(result.error?.error.message ?? "Could not price the cart.");
-  }, [snapshot?.sessionVersion, snapshot?.selections.length]);
+    // Re-quoted after claim too: claiming the guest session bumps its version.
+  }, [snapshot?.sessionVersion, snapshot?.selections.length, claimed]);
 
   useEffect(() => {
     if (snapshot && sharedTransport().isClaimed(snapshot.sessionId)) setClaimed(true);
   }, [snapshot?.sessionId]);
 
   async function onClaim() {
-    if (!snapshot) return;
-    const result = sharedTransport().claimSession({
-      expectedSessionVersion: snapshot.sessionVersion,
-      keepGuestSession: true,
-      sessionId: snapshot.sessionId,
-    });
-    if (result.data) {
+    const ok = await sessionActions.claim();
+    if (ok) {
       setClaimed(true);
       setError(null);
     } else {
-      setError(result.error?.error.message ?? "Demo sign-in failed.");
+      setError("Demo sign-in failed.");
     }
   }
 
@@ -163,7 +159,7 @@ export function CheckoutView({ onOrderPlaced }: { onOrderPlaced: (orderId: strin
               <li key={line.variantId}>
                 <div className="item-row">
                   <span>
-                    {variant ? `${variant.brandName} ${variant.slot.replace("_", " ").toLowerCase()}` : line.variantId}{" "}
+                    {variant ? `${variant.brandName} ${variant.slot.replaceAll("_", " ").toLowerCase()}` : line.variantId}{" "}
                     × {line.quantity}
                   </span>
                   <span>{variant?.priceMinor === null ? "Price unknown" : formatMinor(variant?.priceMinor ?? 0, "INR")}</span>

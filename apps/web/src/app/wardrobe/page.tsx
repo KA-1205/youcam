@@ -108,7 +108,7 @@ export default function WardrobePage() {
           <select id="manual-variant" value={manualVariantId} onChange={(e) => setManualVariantId(e.target.value)}>
             {VARIANTS.map((v) => (
               <option key={v.variantId} value={v.variantId}>
-                {v.brandName} {v.slot.replace("_", " ").toLowerCase()}
+                {v.brandName} {v.slot.replaceAll("_", " ").toLowerCase()}
               </option>
             ))}
           </select>
@@ -153,7 +153,7 @@ export default function WardrobePage() {
               <li key={order.orderId}>
                 <div className="item-row">
                   <span>
-                    <span className="chip">DEMO</span> {order.status.replace("_", " ").toLowerCase()} —{" "}
+                    <span className="chip">DEMO</span> {order.status.replaceAll("_", " ").toLowerCase()} —{" "}
                     {formatMinor(order.totalMinor, order.currency)}
                   </span>
                   <Link className="button button--secondary" href={`/orders/${order.orderId}`}>

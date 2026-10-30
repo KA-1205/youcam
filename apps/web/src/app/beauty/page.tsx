@@ -28,7 +28,7 @@ function ProductBrowser({ slots }: { slots: readonly string[] }) {
           <li key={v.variantId}>
             <div className="item-row">
               <div>
-                <strong>{v.brandName}</strong> <span className="muted">{v.slot.replace("_", " ").toLowerCase()}</span>{" "}
+                <strong>{v.brandName}</strong> <span className="muted">{v.slot.replaceAll("_", " ").toLowerCase()}</span>{" "}
                 — {formatMoney(v.priceMinor, v.currency)}
                 {v.priceMinor === null ? <span className="chip chip--warn">Price unknown</span> : null}{" "}
                 <span className="chip">Attributes unknown</span>
@@ -102,7 +102,7 @@ function WearDiary() {
             <div className="item-row">
               <span>
                 <span className={entry.kind === "CATALOG_FACT" ? "chip" : "chip chip--warn"}>
-                  {entry.kind.replace("_", " ").toLowerCase()}
+                  {entry.kind.replaceAll("_", " ").toLowerCase()}
                 </span>{" "}
                 {entry.note}
               </span>
@@ -184,7 +184,7 @@ export default function BeautyPage() {
           </select>
         </div>
         <p className={verdict.kind === "MATCHED" ? "" : "mode-note"} role="status">
-          <span className="chip chip--warn">{verdict.evidenceKind.replace("_", " ").toLowerCase()}</span>{" "}
+          <span className="chip chip--warn">{verdict.evidenceKind.replaceAll("_", " ").toLowerCase()}</span>{" "}
           {verdict.message}
         </p>
         <p className="footnote">

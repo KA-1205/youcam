@@ -9,7 +9,7 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import type { components } from "../../../../contracts/runtime/client";
 import { buildSessionCreate, type BriefFormState } from "./brief-form";
-import { freshTransport, FixtureTransport } from "./fixture/transport";
+import { sharedTransport, FixtureTransport } from "./fixture/transport";
 
 type SessionSnapshot = components["schemas"]["SessionSnapshot"];
 type ItemRef = components["schemas"]["ItemRef"];
@@ -18,6 +18,8 @@ type StylistJobResult = components["schemas"]["StylistJob"]["result"];
 type Brief = components["schemas"]["Brief"];
 
 const STORAGE_KEY = "anchor-fit.sessionId";
+const SNAPSHOT_KEY = "anchor-fit.session";
+const PROPOSAL_KEY = "anchor-fit.proposal";
 
 export type SessionState = {
   snapshot: SessionSnapshot | null;
@@ -35,6 +37,7 @@ export type SessionActions = {
   restore: () => Promise<void>;
   applyLook: (look: Look) => Promise<void>;
   updateBrief: (patch: Partial<Brief>) => Promise<void>;
+  claim: () => Promise<boolean>;
   toggleLock: (ref: ItemRef) => Promise<void>;
   rejectItem: (ref: ItemRef) => Promise<void>;
   swapSlot: (look: Look, slot: ItemRef["slot"]) => Promise<void>;
@@ -61,12 +64,17 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const transportRef = useRef<FixtureTransport | null>(null);
   const [state, setState] = useState<SessionState>(EMPTY);
 
+  // One shared fixture transport for the whole tab, so every surface sees
+  // the same sessions, jobs and orders.
   const transport = useMemo(() => {
-    if (!transportRef.current) transportRef.current = freshTransport();
+    if (!transportRef.current) transportRef.current = sharedTransport();
     return transportRef.current;
   }, []);
 
   const patch = useCallback((updates: Partial<SessionState>) => {
+    if (updates.snapshot) {
+      window.sessionStorage.setItem(SNAPSHOT_KEY, JSON.stringify(updates.snapshot));
+    }
     setState((prev) => ({ ...prev, ...updates }));
   }, []);
 
@@ -122,6 +130,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         });
         return;
       }
+      window.sessionStorage.setItem(
+        PROPOSAL_KEY,
+        JSON.stringify({ result: job.result, source: job.source }),
+      );
       if (job.result.kind === "LOOKS") {
         patch({ busy: false, jobStatus: "SUCCEEDED", source: job.source, result: job.result, looks: job.result.looks, error: null });
       } else {
@@ -153,13 +165,43 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const restore = useCallback(async () => {
     const id = window.sessionStorage.getItem(STORAGE_KEY);
-    if (!id) return;
-    const { data, error } = transport.getSession(id);
-    if (error || !data) {
-      window.sessionStorage.removeItem(STORAGE_KEY);
-      return;
+    if (id) {
+      const { data, error } = transport.getSession(id);
+      if (data) {
+        patch({ snapshot: data });
+      } else {
+        // The fixture store is per-tab: rehydrate the persisted snapshot so a
+        // reload keeps the session working without inventing server persistence.
+        const raw = window.sessionStorage.getItem(SNAPSHOT_KEY);
+        if (raw) {
+          try {
+            const snapshot = JSON.parse(raw) as SessionSnapshot;
+            if (snapshot.sessionId === id) {
+              transport.restoreSession(snapshot);
+              patch({ snapshot });
+            }
+          } catch {
+            window.sessionStorage.removeItem(SNAPSHOT_KEY);
+          }
+        } else if (error) {
+          window.sessionStorage.removeItem(STORAGE_KEY);
+        }
+      }
     }
-    patch({ snapshot: data });
+    const rawProposal = window.sessionStorage.getItem(PROPOSAL_KEY);
+    if (rawProposal) {
+      try {
+        const saved = JSON.parse(rawProposal) as { result: SessionState["result"]; source: SessionState["source"] };
+        patch({
+          result: saved.result,
+          source: saved.source,
+          jobStatus: "SUCCEEDED",
+          looks: saved.result?.kind === "LOOKS" ? saved.result.looks : [],
+        });
+      } catch {
+        window.sessionStorage.removeItem(PROPOSAL_KEY);
+      }
+    }
   }, [transport, patch]);
 
   /** Persist locks/rejections/selections with CAS, then re-propose. */
@@ -202,6 +244,19 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     },
     [editAndPropose],
   );
+
+  const claim = useCallback(async () => {
+    const snapshot = state.snapshot;
+    if (!snapshot) return false;
+    const { data, error } = transport.claimSession({
+      expectedSessionVersion: snapshot.sessionVersion,
+      keepGuestSession: true,
+      sessionId: snapshot.sessionId,
+    });
+    if (error || !data) return false;
+    patch({ snapshot: data });
+    return true;
+  }, [state.snapshot, transport, patch]);
 
   const updateBrief = useCallback(
     async (briefPatch: Partial<Brief>) => {
@@ -253,9 +308,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(
     () => ({
       state,
-      actions: { startSession, restore, applyLook, updateBrief, toggleLock, rejectItem, swapSlot, refresh, clearError },
+      actions: { startSession, restore, applyLook, updateBrief, claim, toggleLock, rejectItem, swapSlot, refresh, clearError },
     }),
-    [state, startSession, restore, applyLook, updateBrief, toggleLock, rejectItem, swapSlot, refresh, clearError],
+    [state, startSession, restore, applyLook, updateBrief, claim, toggleLock, rejectItem, swapSlot, refresh, clearError],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

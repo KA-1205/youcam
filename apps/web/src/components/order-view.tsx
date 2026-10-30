@@ -48,7 +48,7 @@ export function OrderView({ order, paymentUnknown }: { order: OrderSnapshot; pay
           guarantees no late success.
         </p>
       ) : null}
-      <p className="lede">{STATUS_COPY[status] ?? `Order status: ${status.replace("_", " ").toLowerCase()}.`}</p>
+      <p className="lede">{STATUS_COPY[status] ?? `Order status: ${status.replaceAll("_", " ").toLowerCase()}.`}</p>
       {error ? (
         <p className="error-note" role="alert">
           {error}
@@ -60,7 +60,7 @@ export function OrderView({ order, paymentUnknown }: { order: OrderSnapshot; pay
         <ol className="item-list">
           {TIMELINE.map((step) => (
             <li key={step}>
-              {reached.has(step) ? "✓" : "·"} {step.replace("_", " ").toLowerCase()}
+              {reached.has(step) ? "✓" : "·"} {step.replaceAll("_", " ").toLowerCase()}
             </li>
           ))}
           {status === "CANCELLED" ? <li>✓ cancelled</li> : null}
