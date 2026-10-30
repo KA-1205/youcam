@@ -15,7 +15,7 @@ def test_guest_context_issued_once_with_secure_cookie(client):
     assert 'HttpOnly' in set_cookie and 'SameSite=lax' in set_cookie.replace('Lax', 'lax')
     assert 'anchor_session=' in set_cookie
     body = first.json()
-    assert body['actorId'] and body['tenantId'] == 'tenant-demo'
+    assert body['actorId'] and body['tenantId'] == 'demo-anchor-fit'
     assert body['consent']['consentRevision'] == 1
     assert not any(body['consent']['controls'].values())
 

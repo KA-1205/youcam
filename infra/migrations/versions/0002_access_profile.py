@@ -127,7 +127,7 @@ def upgrade() -> None:
     )
     op.create_index('ix_order_progress_account_id', 'order_progress', ['account_id'])
     op.execute("INSERT INTO tenants (tenant_id, display_name, created_at) "
-               "VALUES ('tenant-demo', 'Anchor Fit — simulated store', CURRENT_TIMESTAMP)")
+               "VALUES ('demo-anchor-fit', 'Anchor Fit — simulated store', CURRENT_TIMESTAMP)")
 
 
 def downgrade() -> None:

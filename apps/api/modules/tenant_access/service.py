@@ -27,7 +27,7 @@ from apps.api.modules.tenant_access.models import (
 
 COOKIE_NAME = 'anchor_session'
 GUEST_TTL = timedelta(hours=24)
-DEMO_TENANT = 'tenant-demo'
+DEMO_TENANT = 'demo-anchor-fit'
 
 
 @dataclass
@@ -111,7 +111,8 @@ class AccessService:
         return Identity(actor_id=actor.actor_id, tenant_id=actor.tenant_id, roles=roles,
                         verified=verified, account_id=account_id, set_cookie=token)
 
-    def demo_login(self, db: Session, cookie_token: str | None, email: str) -> Identity:
+    def demo_login(self, db: Session, cookie_token: str | None, email: str,
+                   roles: tuple[str, ...] = ('SHOPPER',)) -> Identity:
         """Labelled development login: upgrades the current cookie's actor to an account."""
         if not demo_mode_enabled():
             raise LookupError('demo login unavailable')
@@ -125,7 +126,8 @@ class AccessService:
                               email=canonical, verified_at=clock.now(), preferences={},
                               deleted_at=None, created_at=clock.now())
             db.add(account)
-            db.add(AccountRole(account_id=account.account_id, role='SHOPPER'))
+            for role in roles:
+                db.add(AccountRole(account_id=account.account_id, role=role))
         db.flush()
         current = self._load(db, cookie_token) if cookie_token else None
         if current is not None and current.verified and current.account_id == account.account_id:

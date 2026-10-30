@@ -61,7 +61,7 @@ class ProfileService:
     variant is unknown rather than recorded with a guessed slot.
     """
 
-    def __init__(self, resolve_slot: Callable[[str], str] | None = None) -> None:
+    def __init__(self, resolve_slot: Callable[[str], str | None] | None = None) -> None:
         self._resolve_slot = resolve_slot
 
     def ensure_actor_consent(self, db: Session, actor_id: str) -> None:
@@ -254,7 +254,11 @@ class ProfileService:
         if self._resolve_slot is None:
             raise ApiError(409, 'EVENT_OUT_OF_ORDER',
                            'Catalog slot resolution is not wired for commerce events.')
-        return self._resolve_slot(variant_id)
+        slot = self._resolve_slot(variant_id)
+        if slot is None:
+            raise ApiError(409, 'EVENT_OUT_OF_ORDER',
+                           'Commerce event references an unknown variant.')
+        return slot
 
 
 def _visible(row: WardrobeItem, ordered: dict, owned: dict) -> bool:

@@ -7,9 +7,9 @@ in contracts.runtime are never modified here.
 import os
 from collections.abc import Iterator
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
-from fastapi import Depends, FastAPI, Query, Request, Response
+from fastapi import Depends, FastAPI, Header, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
@@ -17,8 +17,12 @@ from sqlalchemy.orm import Session
 from starlette.exceptions import HTTPException
 
 from apps.api.db import Database
+from apps.api.demo_catalog import FixtureCatalog
 from apps.api.errors import ApiError
+from apps.api.modules.commerce.ports import DemoPaymentPort
+from apps.api.modules.commerce.service import CommerceService, replay, store
 from apps.api.modules.shopper_profile.service import ProfileService
+from apps.api.modules.styling_session.service import SessionService
 from apps.api.modules.tenant_access.models import Account as AccessAccount
 from apps.api.modules.tenant_access.service import (
     COOKIE_NAME,
@@ -36,12 +40,22 @@ class DevLoginRequest(BaseModel):
 
     model_config = ConfigDict(extra='forbid', frozen=True)
     email: str = Field(min_length=5, max_length=320, pattern=r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+    role: str = Field(default='SHOPPER', pattern=r'^(SHOPPER|WAREHOUSE_OPERATOR|MERCHANT_ADMIN|'
+                                                r'PLATFORM_OPERATOR|STORE_STYLIST|PARTNER_EDITOR)$')
 
 
 def create_app(database_url: str | None = None) -> FastAPI:
     database = Database(database_url)
+    catalog = FixtureCatalog()
     access_service = AccessService()
-    profile_service = ProfileService()
+    profile_service = ProfileService(resolve_slot=catalog.slot_for)
+    session_service = SessionService(catalog)
+    payment_port = DemoPaymentPort()
+    commerce_service = CommerceService(payment_port, catalog, session_service.assert_editable)
+
+    def ctx_of(db: Session, identity: Identity) -> m.AccessContext:
+        revision = profile_service.latest_revision(db, identity.actor_id)
+        return identity.access_context(revision)
     app = FastAPI(title='Anchor Fit API', version='1.0.0', docs_url=None, redoc_url=None,
                   description='C-owned HTTP delivery; live providers stay disabled until '
                               'verified activation.')
@@ -94,11 +108,12 @@ def create_app(database_url: str | None = None) -> FastAPI:
         return profile_service.save_wardrobe(db, account_id, body.reference, body.saved,
                                              body.manualOwnedQuantity, body.attributesConfirmed)
 
-    def demo_login(body: DevLoginRequest, response: Response,
+    def demo_login(body: DevLoginRequest, response: Response, request: Request,
                    db: Session = Depends(get_db)) -> dict[str, Any]:
         if not demo_mode_enabled():
             raise HTTPException(404)
-        identity = access_service.demo_login(db, None, body.email)
+        identity = access_service.demo_login(db, request.cookies.get(COOKIE_NAME), body.email,
+                                             roles=(body.role,))
         if identity.set_cookie:
             response.set_cookie(COOKIE_NAME, identity.set_cookie, max_age=86400, path='/',
                                 httponly=True, secure=True, samesite='lax')
@@ -109,11 +124,111 @@ def create_app(database_url: str | None = None) -> FastAPI:
         access_service.logout(db, None)
         return {'status': 'ok'}
 
+    def _idempotent(db: Session, identity: Identity, operation: str, key: UUID, body: Any,
+                    produce) -> Any:
+        cached = replay(db, identity.actor_id, operation, key, body.model_dump())
+        if cached is not None:
+            return cached
+        produced = produce()
+        store(db, identity.actor_id, operation, key, body.model_dump(),
+              produced.model_dump(mode='json'), 0)
+        return produced
+
+    def create_session(body: m.SessionCreate, idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                       identity: Identity = Depends(get_identity),
+                       db: Session = Depends(get_db)) -> m.SessionSnapshot:
+        return _idempotent(db, identity, 'createSession', idempotency_key, body,
+                           lambda: session_service.create(db, ctx_of(db, identity), body))
+
+    def get_session(sessionId: UUID, identity: Identity = Depends(get_identity),
+                    db: Session = Depends(get_db)) -> m.SessionSnapshot:
+        return session_service.snapshot(db, ctx_of(db, identity), sessionId)
+
+    def edit_session(sessionId: UUID, body: m.SessionEdit,
+                     identity: Identity = Depends(get_identity),
+                     db: Session = Depends(get_db)) -> m.SessionSnapshot:
+        return session_service.edit(db, ctx_of(db, identity), sessionId, body)
+
+    def claim_session(body: m.ClaimSession,
+                      idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                      identity: Identity = Depends(get_identity),
+                      db: Session = Depends(get_db)) -> m.SessionSnapshot:
+        if not identity.verified:
+            raise ApiError(403, 'SCOPE_FORBIDDEN', 'Session claims require a verified account.')
+        assert identity.account_id is not None
+        return session_service.claim(db, ctx_of(db, identity), body, identity.account_id)
+
+    def quote_cart(body: m.CartRequest, idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                   identity: Identity = Depends(get_identity),
+                   db: Session = Depends(get_db)) -> m.CartQuote:
+        if not identity.verified:
+            raise ApiError(403, 'SCOPE_FORBIDDEN', 'Cart quotes require a verified account.')
+        return _idempotent(db, identity, 'quoteCart', idempotency_key, body,
+                           lambda: commerce_service.quote_cart(db, ctx_of(db, identity), body))
+
+    def confirm_checkout(body: m.CheckoutConfirm,
+                         idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                         identity: Identity = Depends(get_identity),
+                         db: Session = Depends(get_db)) -> m.OrderSnapshot:
+        if not identity.verified:
+            raise ApiError(403, 'SCOPE_FORBIDDEN', 'Checkout requires a verified account.')
+        assert identity.account_id is not None
+        return _idempotent(db, identity, 'confirmCheckout', idempotency_key, body,
+                           lambda: commerce_service.confirm_checkout(db, ctx_of(db, identity), body,
+                                                                     identity.account_id or ''))
+
+    def get_order(orderId: UUID, identity: Identity = Depends(get_identity),
+                  db: Session = Depends(get_db)) -> m.OrderSnapshot:
+        return commerce_service.get_order(db, ctx_of(db, identity), orderId)
+
+    def cancel_order(orderId: UUID, body: m.OrderAction,
+                     idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                     identity: Identity = Depends(get_identity),
+                     db: Session = Depends(get_db)) -> m.OrderSnapshot:
+        return _idempotent(db, identity, 'cancelOrder', idempotency_key, body,
+                           lambda: commerce_service.cancel_order(db, ctx_of(db, identity), orderId,
+                                                                 body))
+
+    def request_return(orderId: UUID, body: m.OrderAction,
+                       idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                       identity: Identity = Depends(get_identity),
+                       db: Session = Depends(get_db)) -> m.OrderSnapshot:
+        return _idempotent(db, identity, 'requestReturn', idempotency_key, body,
+                           lambda: commerce_service.request_return(db, ctx_of(db, identity),
+                                                                   orderId, body))
+
+    def advance_fulfilment(orderId: UUID, body: m.FulfilmentAction,
+                           idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                           identity: Identity = Depends(get_identity),
+                           db: Session = Depends(get_db)) -> m.OrderSnapshot:
+        return _idempotent(db, identity, 'advanceFulfilment', idempotency_key, body,
+                           lambda: commerce_service.advance_fulfilment(db, ctx_of(db, identity),
+                                                                       orderId, body))
+
+    def receive_return(orderId: UUID, body: m.OrderAction,
+                       idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                       identity: Identity = Depends(get_identity),
+                       db: Session = Depends(get_db)) -> m.OrderSnapshot:
+        return _idempotent(db, identity, 'receiveReturn', idempotency_key, body,
+                           lambda: commerce_service.receive_return(db, ctx_of(db, identity),
+                                                                   orderId, body))
+
     HANDLERS: dict[str, Any] = {
         'getProfile': get_profile,
         'updateConsent': update_consent,
         'listWardrobe': list_wardrobe,
         'saveWardrobeItem': save_wardrobe,
+        'createSession': create_session,
+        'getSession': get_session,
+        'editSession': edit_session,
+        'claimSession': claim_session,
+        'quoteCart': quote_cart,
+        'confirmCheckout': confirm_checkout,
+        'getOrder': get_order,
+        'cancelOrder': cancel_order,
+        'requestReturn': request_return,
+        'advanceFulfilment': advance_fulfilment,
+        'receiveReturn': receive_return,
     }
 
     @app.middleware('http')
@@ -178,6 +293,9 @@ def create_app(database_url: str | None = None) -> FastAPI:
                           'x-domain-owner': 'C', 'x-implementation-status': 'DEMO_ONLY',
                           'summary': 'Labelled development login for isolated demo deployments'})
     app.state.database = database
+    app.state.commerce_service = commerce_service
+    app.state.session_service = session_service
+    app.state.profile_service = profile_service
     return app
 
 
