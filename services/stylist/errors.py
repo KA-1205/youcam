@@ -31,6 +31,24 @@ class StaleSessionError(StylistError):
         super().__init__('STALE_SESSION', message)
 
 
+class PermissionDenied(StylistError):
+    """A known scope was revoked or the role is not authorized for the action."""
+
+    status = 403
+
+    def __init__(self, message: str = 'This action is not allowed for your role.') -> None:
+        super().__init__('PERMISSION_DENIED', message)
+
+
+class InvalidRequestError(StylistError):
+    """Semantically invalid input that the frozen DTO shape cannot express."""
+
+    status = 422
+
+    def __init__(self, message: str, code: str = 'INVALID_REQUEST') -> None:
+        super().__init__(code, message)
+
+
 class IdempotencyConflict(StylistError):
     """The same idempotency key was reused with a different request body."""
 
