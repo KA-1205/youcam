@@ -6,6 +6,7 @@ from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
 
+from apps.api.db import Database
 from apps.api.main import create_app
 
 ROOT = os.getcwd()
@@ -40,6 +41,16 @@ def client(db_url):
 def make_client(db_url):
     app = create_app(database_url=db_url)
     return TestClient(app, base_url='https://testserver')
+
+
+@pytest.fixture()
+def runtime_factory(db_url):
+    def make(client_factory=None):
+        from apps.worker.runtime import build_runtime
+
+        return build_runtime(Database(db_url), client_factory=client_factory)
+
+    return make
 
 
 def migration_round_trip(db_url_value):

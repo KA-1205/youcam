@@ -76,6 +76,12 @@ class StorageService:
         row = self._owned_asset(db, ctx, asset_id)
         return self._descriptor(db, row.asset_id, issue_access=row.status == 'AVAILABLE')
 
+    def asset_available(self, db: Session, ctx: AccessContext, asset_id: str) -> bool:
+        """Injected into preview orchestration so it never imports storage internals."""
+        row = db.get(AssetRow, asset_id)
+        return bool(row is not None and row.tenant_id == ctx.tenantId
+                    and row.actor_id == ctx.actorId and row.status == 'AVAILABLE')
+
     def save_asset(self, db: Session, ctx: AccessContext, asset_id: str,
                    body: SaveAsset) -> AssetDescriptor:
         self._require_consent(db, ctx.actorId, 'savePhotosAndRenders')
@@ -99,6 +105,28 @@ class StorageService:
         self._audit(db, asset_id, ctx.actorId, 'DELETED', {'mode': self._backend.mode})
         db.flush()
         return Ack(requestId=uuid4(), status='ACCEPTED')
+
+    def store_render_result(self, db: Session, tenant_id: str, actor_id: str,
+                            capability: str, data: bytes = b'fixture-render-bytes') -> str:
+        """Persist a provider result into private storage as a fresh unsaved asset.
+
+        A provider URL is never the durable saved artifact; bytes are captured
+        while consent remains valid and expire on the unsaved 24h clock.
+        """
+        asset_id = str(uuid4())
+        storage_key = f'{tenant_id}/{asset_id}'
+        self._backend.put(storage_key, data)
+        now = clock.now()
+        db.add(AssetRow(asset_id=asset_id, tenant_id=tenant_id, actor_id=actor_id,
+                        account_id=None, capability=capability, content_type='image/png',
+                        byte_length=len(data), digest=hashlib.sha256(data).hexdigest(),
+                        storage_key=storage_key, status='AVAILABLE', saved=False,
+                        last_saved_at=None, expires_at=now + UNSAVED_TTL, deleted_at=None,
+                        created_at=now, updated_at=now))
+        self._audit(db, asset_id, actor_id, 'UPLOADED', {'mode': self._backend.mode,
+                                                         'origin': 'PREVIEW_RESULT'})
+        db.flush()
+        return asset_id
 
     def sweep_expired(self, db: Session, now: datetime | None = None) -> int:
         """Expire unsaved assets after 24h and saved assets 90d after the last save."""

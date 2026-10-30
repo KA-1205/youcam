@@ -9,6 +9,7 @@ from collections.abc import Iterator
 from typing import Any
 from uuid import UUID, uuid4
 
+import sqlalchemy
 from fastapi import Depends, FastAPI, Header, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -33,6 +34,8 @@ from apps.api.modules.tenant_access.service import (
     Identity,
     demo_mode_enabled,
 )
+from apps.api.modules.try_on_jobs.orchestration import PreviewService
+from apps.api.ratelimit import RateLimiter
 from contracts.runtime import models as m
 from contracts.runtime.routes import ROUTES
 from contracts.runtime.transport import SECURITY_HEADERS, error
@@ -58,6 +61,10 @@ def create_app(database_url: str | None = None) -> FastAPI:
     commerce_service = CommerceService(payment_port, catalog, session_service.assert_editable,
                                        task_service.enqueue_direct)
     storage_service = StorageService(create_backend(), profile_service.consent_snapshot)
+    preview_service = PreviewService(session_service.assert_editable, catalog,
+                                     profile_service.consent_snapshot,
+                                     storage_service.store_render_result, task_service,
+                                     storage_service.asset_available)
 
     def ctx_of(db: Session, identity: Identity) -> m.AccessContext:
         revision = profile_service.latest_revision(db, identity.actor_id)
@@ -242,6 +249,28 @@ def create_app(database_url: str | None = None) -> FastAPI:
                            lambda: storage_service.save_asset(db, ctx_of(db, identity),
                                                               str(assetId), body))
 
+    def list_capabilities(db: Session = Depends(get_db)) -> m.CapabilityPage:
+        from apps.api.modules.try_on_jobs.capabilities import capability_page
+
+        return capability_page(db)
+
+    def create_preview_job(body: m.PreviewRequest,
+                           idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                           identity: Identity = Depends(get_identity),
+                           db: Session = Depends(get_db)) -> m.PreviewJob:
+        job_id = preview_service.enqueue(db, ctx_of(db, identity), body,
+                                         profile_service.consent_snapshot(db, identity.actor_id),
+                                         idempotency_key)
+        return preview_service.get(db, ctx_of(db, identity), job_id)
+
+    def get_preview_job(jobId: UUID, identity: Identity = Depends(get_identity),
+                        db: Session = Depends(get_db)) -> m.PreviewJob:
+        return preview_service.get(db, ctx_of(db, identity), jobId)
+
+    def cancel_preview_job(jobId: UUID, identity: Identity = Depends(get_identity),
+                           db: Session = Depends(get_db)) -> m.PreviewJob:
+        return preview_service.cancel(db, ctx_of(db, identity), jobId)
+
     HANDLERS: dict[str, Any] = {
         'getProfile': get_profile,
         'updateConsent': update_consent,
@@ -262,13 +291,47 @@ def create_app(database_url: str | None = None) -> FastAPI:
         'getAsset': get_asset,
         'deleteAsset': delete_asset,
         'saveAsset': save_asset,
+        'createPreviewJob': create_preview_job,
+        'getPreviewJob': get_preview_job,
+        'cancelPreviewJob': cancel_preview_job,
+        'listCapabilities': list_capabilities,
     }
+
+    limiter = RateLimiter()
 
     @app.middleware('http')
     async def security_headers(request: Request, call_next):
         response = await call_next(request)
         response.headers.update(SECURITY_HEADERS)
         return response
+
+    @app.middleware('http')
+    async def rate_limit(request: Request, call_next):
+        # Pre-auth endpoints have no stable cookie, so limit them by client host.
+        pre_auth = request.url.path.endswith('/auth/demo-login')
+        fingerprint = (request.client.host if request.client else 'anonymous') if pre_auth \
+            else (request.cookies.get(COOKIE_NAME)
+                  or (request.client.host if request.client else 'anonymous'))
+        if request.method in ('POST', 'PUT', 'DELETE'):
+            try:
+                limiter.check(fingerprint, request.url.path)
+            except ApiError as error:
+                # Middleware sits outside the exception handlers; return the envelope here.
+                body = m.ErrorEnvelope(error=m.ErrorDetail(code=error.code, message=error.message),
+                                       requestId=uuid4())
+                return JSONResponse(body.model_dump(mode='json'), status_code=error.status,
+                                    headers={**SECURITY_HEADERS, **(error.headers or {})})
+        return await call_next(request)
+
+    @app.get('/readyz', operation_id='ready')
+    def ready() -> dict[str, object]:
+        connected = True
+        try:
+            with database.unit_of_work() as db:
+                db.execute(sqlalchemy.text('SELECT 1'))
+        except Exception:
+            connected = False
+        return {'ready': connected, 'database': connected, 'liveProvidersEnabled': False}
 
     @app.exception_handler(ApiError)
     async def domain_error(request: Request, exc: ApiError) -> JSONResponse:
@@ -331,6 +394,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
     app.state.profile_service = profile_service
     app.state.task_service = task_service
     app.state.storage_service = storage_service
+    app.state.preview_service = preview_service
     return app
 
 

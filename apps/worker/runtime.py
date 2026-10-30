@@ -4,6 +4,7 @@ import json
 import os
 import socket
 from dataclasses import dataclass
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -22,6 +23,7 @@ from apps.api.modules.styling_session.service import SessionService
 from apps.api.modules.task_runtime.models import DurableTaskRow
 from apps.api.modules.task_runtime.service import TaskService
 from apps.api.modules.tenant_access.service import AccessService
+from apps.api.modules.try_on_jobs.orchestration import PreviewService
 from contracts.runtime.models import CommerceEvent
 
 OUTBOX_TTL_MARK = 'PUBLISHED'
@@ -39,6 +41,7 @@ class Runtime:
     commerce: CommerceService
     storage: StorageService
     storage_backend: StorageBackend
+    preview: PreviewService
     worker_id: str
 
     def cycle(self, max_tasks: int = 10) -> dict:
@@ -82,6 +85,8 @@ class Runtime:
             self._publish_commerce_event(db, resource_id, context)
         elif operation == 'ASSET_DELETE':
             self._purge_asset(db, resource_id)
+        elif operation == 'PREVIEW':
+            self.preview.run(db, UUID(resource_id))
         elif operation == 'STYLIST':
             raise ApiError(503, 'STYLIST_UNAVAILABLE',
                            'The stylist lane is not integrated on this branch.')
@@ -145,7 +150,7 @@ class Runtime:
             return enqueued
 
 
-def build_runtime(database: Database) -> Runtime:
+def build_runtime(database: Database, client_factory=None) -> Runtime:
     catalog = FixtureCatalog()
     profile = ProfileService(resolve_slot=catalog.slot_for)
     sessions = SessionService(catalog)
@@ -154,9 +159,13 @@ def build_runtime(database: Database) -> Runtime:
     commerce = CommerceService(payment, catalog, sessions.assert_editable, tasks.enqueue_direct)
     storage_backend = create_backend()
     storage = StorageService(storage_backend, lambda db, actor: profile.consent_snapshot(db, actor))
+    preview = PreviewService(sessions.assert_editable, catalog,
+                             lambda db, actor: profile.consent_snapshot(db, actor),
+                             storage.store_render_result, tasks, storage.asset_available,
+                             client_factory=client_factory)
     return Runtime(database=database, catalog=catalog, access=AccessService(), profile=profile,
                    sessions=sessions, tasks=tasks, payment=payment, commerce=commerce,
-                   storage=storage, storage_backend=storage_backend,
+                   storage=storage, storage_backend=storage_backend, preview=preview,
                    worker_id=os.getenv('WORKER_ID', f'worker-{socket.gethostname()}'))
 
 

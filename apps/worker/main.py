@@ -6,6 +6,7 @@
 import argparse
 import json
 import os
+import signal
 import time
 
 from apps.api.db import Database
@@ -31,9 +32,17 @@ def main() -> None:
     if args.once:
         print(json.dumps(runtime.cycle()))
         return
-    while True:
+    stopping = {'stop': False}
+
+    def request_stop(signum, frame) -> None:
+        stopping['stop'] = True  # finish the current task, then exit
+
+    signal.signal(signal.SIGTERM, request_stop)
+    signal.signal(signal.SIGINT, request_stop)
+    while not stopping['stop']:
         print(json.dumps(runtime.cycle()), flush=True)
         time.sleep(args.interval)
+    print(json.dumps({'status': 'STOPPED'}), flush=True)
 
 
 if __name__ == '__main__':
