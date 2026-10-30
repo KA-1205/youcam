@@ -37,6 +37,10 @@ export default function PreviewPage() {
     sessionActions.restore();
     const page = sharedTransport().listCapabilities();
     if (page.data) setCapabilities(page.data.items);
+    const requested = new URLSearchParams(window.location.search).get("capability");
+    if (requested && TABS.includes(requested)) {
+      dispatch({ type: "SET_CAPABILITY", capability: requested });
+    }
   }, []);
 
   const snapshot = sessionState.snapshot;
