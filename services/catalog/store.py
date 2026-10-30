@@ -21,6 +21,8 @@ from contracts.runtime.models import (
 from .errors import InvalidRequestError, NotFoundError, StaleCatalogError
 
 FRESHNESS = timedelta(minutes=15)
+OVERRIDABLE_FIELDS = frozenset({'brandName', 'options', 'attributes', 'imageId',
+                                'previewStatus'})
 
 
 def _utcnow() -> datetime:
@@ -36,6 +38,7 @@ class CatalogStore:
         self._variants: dict[tuple[str, str], CatalogVariant] = {}
         for variant in variants:
             self._variants[(variant.tenantId, variant.variantId)] = variant
+        self._overrides: dict[tuple[str, str], dict[str, object]] = {}
         self._version = 1
         self._refresh_expired()
 
@@ -59,6 +62,15 @@ class CatalogStore:
             raise NotFoundError()
         return found
 
+    def find(self, tenant_id: str, variant_id: str) -> CatalogVariant | None:
+        """Return a variant in any publication state, without freshness refresh."""
+        return self._variants.get((tenant_id, variant_id))
+
+    def observation(self) -> tuple[datetime, datetime]:
+        """Current observation window (checkedAt, expiresAt) for incoming data."""
+        now = self._now()
+        return now, now + FRESHNESS
+
     def snapshot(self, ctx: AccessContext, variant_ids: list[str]) -> CatalogSnapshot:
         self._refresh_expired()
         unique: list[str] = []
@@ -76,6 +88,26 @@ class CatalogStore:
     @property
     def version(self) -> int:
         return self._version
+
+    # -- merchant overrides and publication ----------------------------------
+    def set_override(self, tenant_id: str, variant_id: str, fields: dict[str, object]) -> None:
+        """Record merchant-owned fields; source syncs may never overwrite them."""
+        unknown = set(fields) - OVERRIDABLE_FIELDS
+        if unknown:
+            raise InvalidRequestError(
+                f'Fields cannot be overridden: {", ".join(sorted(unknown))}.')
+        key = (tenant_id, variant_id)
+        merged = {**self._overrides.get(key, {}), **fields}
+        self._overrides[key] = merged
+
+    def apply_variants(self, variants: list[CatalogVariant]) -> None:
+        """Apply an approved publication; overrides take precedence over source data."""
+        for variant in variants:
+            overrides = self._overrides.get((variant.tenantId, variant.variantId), {})
+            if overrides:
+                variant = variant.model_copy(update=dict(overrides))
+            self._variants[(variant.tenantId, variant.variantId)] = variant
+        self._version += 1
 
     # -- freshness -----------------------------------------------------------
     def _refresh_expired(self) -> None:
