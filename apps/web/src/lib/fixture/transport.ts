@@ -38,6 +38,17 @@ type WardrobePage = components["schemas"]["WardrobePage"];
 type WardrobeItem = components["schemas"]["WardrobeItem"];
 type WardrobeSave = components["schemas"]["WardrobeSave"];
 type ClaimSession = components["schemas"]["ClaimSession"];
+type ShareCreate = components["schemas"]["ShareCreate"];
+type ShareSnapshot = components["schemas"]["ShareSnapshot"];
+type ProposalCreate = components["schemas"]["ProposalCreate"];
+type ProposalSnapshot = components["schemas"]["ProposalSnapshot"];
+type ProposalApply = components["schemas"]["ProposalApply"];
+type ProposalRefresh = components["schemas"]["ProposalRefresh"];
+type CatalogBatch = components["schemas"]["CatalogBatch"];
+type CatalogStage = components["schemas"]["CatalogStage"];
+type PublishStage = components["schemas"]["PublishStage"];
+type Insights = components["schemas"]["Insights"];
+type Ack = components["schemas"]["Ack"];
 
 export type FixtureError = { error: { code: string; message: string; details?: Record<string, string> }; requestId: string };
 
@@ -86,6 +97,9 @@ export class FixtureTransport {
   private quotes = new Map<string, CartQuote>();
   private wardrobe = new Map<string, WardrobeItem>();
   private claimedSessions = new Set<string>();
+  private shares = new Map<string, ShareSnapshot>();
+  private proposals = new Map<string, ProposalSnapshot>();
+  private stages = new Map<string, CatalogStage>();
 
   listVariants(query: { slot?: string; cursor?: string | null }): FixtureResult<CatalogPage> {
     let items: CatalogVariant[] = VARIANTS;
@@ -621,6 +635,181 @@ export class FixtureTransport {
       }
     }
     return { data: { items: [...items.values()], nextCursor: null } };
+  }
+
+  createShare(body: ShareCreate): FixtureResult<ShareSnapshot> {
+    const session = this.sessions.get(body.sessionId);
+    if (!session) return fail(404, "NOT_FOUND", "Unknown fixture session.");
+    if (body.expectedSessionVersion !== session.sessionVersion) {
+      return fail(409, "STALE_SESSION", "Refresh this session.");
+    }
+    if (body.expectedConsentRevision !== session.consentRevision) {
+      return fail(409, "STALE_CONSENT", "Consent changed. Review it and retry.");
+    }
+    const share: ShareSnapshot = {
+      expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+      includedAssetIds: [...body.includedAssetIds],
+      recipientAccountId: body.recipientAccountId,
+      revoked: false,
+      sessionId: body.sessionId,
+      shareId: crypto.randomUUID(),
+    };
+    this.shares.set(share.shareId, share);
+    return { data: structuredClone(share) };
+  }
+
+  /** Active (non-revoked) shares visible to a recipient account. */
+  listShares(recipientAccountId: string): FixtureResult<ShareSnapshot[]> {
+    const shares = [...this.shares.values()].filter(
+      (s) => s.recipientAccountId === recipientAccountId && !s.revoked,
+    );
+    return { data: shares.map((s) => structuredClone(s)) };
+  }
+
+  revokeShare(shareId: string): FixtureResult<ShareSnapshot> {
+    const share = this.shares.get(shareId);
+    if (!share) return fail(404, "NOT_FOUND", "Unknown fixture share.");
+    share.revoked = true;
+    return { data: structuredClone(share) };
+  }
+
+  createProposal(body: ProposalCreate): FixtureResult<ProposalSnapshot> {
+    const session = this.sessions.get(body.sessionId);
+    if (!session) return fail(404, "NOT_FOUND", "Unknown fixture session.");
+    if (body.baseSessionVersion > session.sessionVersion) {
+      return fail(409, "STALE_SESSION", "Base version is newer than the session.");
+    }
+    const proposal: ProposalSnapshot = {
+      baseSessionVersion: body.baseSessionVersion,
+      brief: structuredClone(body.brief),
+      exceptions: structuredClone(body.exceptions),
+      notes: body.notes,
+      proposalId: crypto.randomUUID(),
+      selections: structuredClone(body.selections),
+      sessionId: body.sessionId,
+      status: "PROPOSAL_READY",
+    };
+    this.proposals.set(proposal.proposalId, proposal);
+    return { data: structuredClone(proposal) };
+  }
+
+  getProposal(proposalId: string): FixtureResult<ProposalSnapshot> {
+    const proposal = this.proposals.get(proposalId);
+    if (!proposal) return fail(404, "NOT_FOUND", "Unknown fixture proposal.");
+    return { data: structuredClone(proposal) };
+  }
+
+  applyProposal(proposalId: string, body: ProposalApply): FixtureResult<SessionSnapshot> {
+    const proposal = this.proposals.get(proposalId);
+    if (!proposal) return fail(404, "NOT_FOUND", "Unknown fixture proposal.");
+    if (proposal.status !== "PROPOSAL_READY") {
+      return fail(409, "INVALID_STATE", "This proposal was already handled.");
+    }
+    const session = this.sessions.get(proposal.sessionId);
+    if (!session) return fail(404, "NOT_FOUND", "Unknown fixture session.");
+    if (body.expectedSessionVersion !== session.sessionVersion) {
+      return fail(409, "STALE_SESSION", "Refresh this session before applying.");
+    }
+    const next: SessionSnapshot = {
+      ...session,
+      sessionVersion: session.sessionVersion + 1,
+      selections: structuredClone(proposal.selections),
+    };
+    this.sessions.set(proposal.sessionId, next);
+    proposal.status = "ACCEPTED";
+    return { data: structuredClone(next) };
+  }
+
+  requestProposalRefresh(proposalId: string, _body: ProposalRefresh): FixtureResult<Ack> {
+    void _body;
+    const proposal = this.proposals.get(proposalId);
+    if (!proposal) return fail(404, "NOT_FOUND", "Unknown fixture proposal.");
+    return { data: { requestId: crypto.randomUUID(), status: "ACCEPTED" } };
+  }
+
+  stageCatalog(batch: CatalogBatch): FixtureResult<CatalogStage> {
+    const errors: CatalogStage["errors"] = [];
+    const seen = new Set<string>();
+    const changed: string[] = [];
+    for (const variant of batch.variants) {
+      if (seen.has(variant.variantId)) {
+        errors.push({
+          code: "DUPLICATE_VARIANT",
+          message: `Variant ${variant.variantId} appears twice in the batch.`,
+          details: {},
+        });
+        continue;
+      }
+      seen.add(variant.variantId);
+      if (variant.stock === null) {
+        errors.push({
+          code: "UNKNOWN_STOCK",
+          message: `Variant ${variant.variantId} has unknown stock.`,
+          details: {},
+        });
+      }
+      changed.push(variant.variantId);
+    }
+    const stage: CatalogStage = {
+      changedVariantIds: changed,
+      errors,
+      published: false,
+      sourceVersion: batch.sourceVersion,
+      stageId: crypto.randomUUID(),
+    };
+    this.stages.set(stage.stageId, structuredClone(stage));
+    return { data: structuredClone(stage) };
+  }
+
+  publishCatalog(stageId: string, body: PublishStage): FixtureResult<Ack> {
+    const stage = this.stages.get(stageId);
+    if (!stage) return fail(404, "NOT_FOUND", "Unknown fixture stage.");
+    if (body.expectedSourceVersion !== stage.sourceVersion) {
+      return fail(409, "STALE_SOURCE", "The source changed since staging. Re-stage.");
+    }
+    return { data: { requestId: crypto.randomUUID(), status: "ACCEPTED" } };
+  }
+
+  getInsights(): FixtureResult<Insights> {
+    const windowStart = "2026-10-23T00:00:00Z";
+    const windowEnd = "2026-10-30T00:00:00Z";
+    return {
+      data: {
+        metrics: [
+          {
+            name: "looks_generated",
+            mode: "DEMO",
+            numerator: 14,
+            denominator: null,
+            distinctShoppers: 14,
+            suppressed: false,
+            windowStart,
+            windowEnd,
+          },
+          {
+            name: "previews_completed",
+            mode: "DEMO",
+            numerator: 6,
+            denominator: null,
+            distinctShoppers: 8,
+            suppressed: true,
+            windowStart,
+            windowEnd,
+          },
+          {
+            name: "demo_plan_usage",
+            mode: "DEMO",
+            numerator: 20,
+            denominator: 100,
+            distinctShoppers: 14,
+            suppressed: false,
+            windowStart,
+            windowEnd,
+          },
+        ],
+        nextCursor: null,
+      },
+    };
   }
 }
 
