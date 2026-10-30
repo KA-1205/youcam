@@ -142,6 +142,14 @@ class CatalogVariant(DTO):
     isSynthetic: bool
 
 
+class CatalogQuery(DTO):
+    """Optional discovery criteria; server always enforces tenant eligibility."""
+    search: Annotated[str, Field(min_length=1, max_length=200)] | None = None
+    slot: Slot | None = None
+    brandKind: Literal['OWN', 'SPONSOR'] | None = None
+    inStock: bool | None = None
+
+
 class CatalogPage(DTO):
     items: list[CatalogVariant]
     nextCursor: str | None
