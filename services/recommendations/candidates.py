@@ -154,8 +154,12 @@ def _purchasable(variant: CatalogVariant, brief: Brief, now: datetime) -> bool:
 
 def _preference_matches(variant: CatalogVariant, preferences: dict[str, str]) -> int:
     values = {**variant.attributes, **variant.options}
-    return sum(1 for key, value in preferences.items()
-               if values.get(key) and values[key].casefold() == value.casefold())
+    matches = 0
+    for key, value in preferences.items():
+        observed = values.get(key)
+        if observed is not None and observed.casefold() == value.casefold():
+            matches += 1
+    return matches
 
 
 def _missing_optional(variant: CatalogVariant, preferences: dict[str, str]) -> int:
