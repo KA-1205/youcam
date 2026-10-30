@@ -57,6 +57,19 @@ def message_errors(message: str) -> list[str]:
     return []
 
 
+def commit_message_errors(message: str, branch: str, parent_count: int) -> list[str]:
+    """Permit only genuine GitHub PR merge envelopes on main."""
+    if branch == 'main' and parent_count == 2:
+        match = re.fullmatch(
+            r'Merge pull request #[1-9][0-9]* from [A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+'
+            r'\\n\\n([^\\n]{1,100})\\n*',
+            message,
+        )
+        if match and not re.search(r'(?i)co-authored|generated.by', match.group(1)):
+            return []
+    return message_errors(message)
+
+
 def secret_errors(paths: list[str]) -> list[str]:
     errors = []
     for path in paths:
@@ -88,7 +101,9 @@ def main() -> None:
         paths = git('diff', '--name-only', '--no-renames', args.base, args.head).splitlines()
         errors += path_errors(paths, args.branch, ownership)
         for sha in git('rev-list', f'{args.base}..{args.head}').splitlines():
-            errors += [f'{sha}: {e}' for e in message_errors(git('show', '-s', '--format=%B', sha))]
+            parents = len(git('show', '-s', '--format=%P', sha).split())
+            errors += [f'{sha}: {e}' for e in commit_message_errors(
+                git('show', '-s', '--format=%B', sha), args.branch, parents)]
     if errors:
         raise SystemExit('\n'.join(errors))
     print('PASS: source hashes, inventory, scope, commit subjects and tracked secret checks')
