@@ -1,3 +1,5 @@
+> **CURRENT EXECUTION OVERRIDE (October 30, 2026):** The repository and branches are already initialized. The approved current prompts are [prom.md](./prom.md), [Account 1](./prompts/account-1/prom.md), [Account 2](./prompts/account-2/prom.md), and [Account 3](./prompts/account-3/prom.md). Original specs: [Anchor-Fit-v3.3-Specifications.zip](./Anchor-Fit-v3.3-Specifications.zip). Original skills: [skills/original](./skills/original/README.md). Do not rerun initialization, recreate existing branches, or require the old plan ZIP. Account 3 must verify the live foundation status before any feature work. 
+
 # Anchor Fit implementation handbook
 
 This `docs` branch is the **only planning and execution reference** for Anchor Fit v3.3. It is **not** an implementation branch. Do not merge `docs` into `main`.
