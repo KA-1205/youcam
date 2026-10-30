@@ -28,6 +28,16 @@ type PreviewJob = components["schemas"]["PreviewJob"];
 type ConsentUpdate = components["schemas"]["ConsentUpdate"];
 type ConsentSnapshot = components["schemas"]["ConsentSnapshot"];
 type CapabilityPage = components["schemas"]["CapabilityPage"];
+type CartRequest = components["schemas"]["CartRequest"];
+type CartQuote = components["schemas"]["CartQuote"];
+type CheckoutConfirm = components["schemas"]["CheckoutConfirm"];
+type OrderSnapshot = components["schemas"]["OrderSnapshot"];
+type OrderAction = components["schemas"]["OrderAction"];
+type FulfilmentAction = components["schemas"]["FulfilmentAction"];
+type WardrobePage = components["schemas"]["WardrobePage"];
+type WardrobeItem = components["schemas"]["WardrobeItem"];
+type WardrobeSave = components["schemas"]["WardrobeSave"];
+type ClaimSession = components["schemas"]["ClaimSession"];
 
 export type FixtureError = { error: { code: string; message: string; details?: Record<string, string> }; requestId: string };
 
@@ -56,11 +66,26 @@ const CAPABILITIES: CapabilityPage = {
   ),
 };
 
+type DemoOutcome = "SUCCESS" | "DECLINE" | "AUTH_REQUIRED" | "TIMEOUT";
+
+type FixtureOrder = {
+  snapshot: OrderSnapshot;
+  lines: components["schemas"]["CartLine"][];
+  scripted: DemoOutcome;
+  paymentUnknown: boolean;
+  /** ordered contributes from PAID until DELIVERED; owned from DELIVERED until return receipt */
+  stage: "PENDING" | "ACTIVE" | "DELIVERED" | "CLOSED";
+};
+
 export class FixtureTransport {
   private sessions = new Map<string, SessionSnapshot>();
   private jobs = new Map<string, StylistJob>();
   private assets = new Map<string, AssetDescriptor>();
   private previewJobs = new Map<string, PreviewJob>();
+  private orders = new Map<string, FixtureOrder>();
+  private quotes = new Map<string, CartQuote>();
+  private wardrobe = new Map<string, WardrobeItem>();
+  private claimedSessions = new Set<string>();
 
   listVariants(query: { slot?: string; cursor?: string | null }): FixtureResult<CatalogPage> {
     let items: CatalogVariant[] = VARIANTS;
@@ -329,6 +354,273 @@ export class FixtureTransport {
   /** Debug helper used by tests. */
   assetCount(): number {
     return this.assets.size;
+  }
+
+  quoteCart(body: CartRequest): FixtureResult<CartQuote> {
+    const session = this.sessions.get(body.sessionId);
+    if (!session) return fail(404, "NOT_FOUND", "Unknown fixture session.");
+    if (body.expectedSessionVersion !== session.sessionVersion) {
+      return fail(409, "STALE_SESSION", "Refresh this session.");
+    }
+    let merchandise = 0;
+    for (const line of body.lines) {
+      const variant = VARIANTS.find((v) => v.variantId === line.variantId);
+      if (!variant) return fail(404, "NOT_FOUND", `Unknown variant ${line.variantId}.`);
+      if (variant.priceMinor === null) {
+        return fail(422, "UNKNOWN_PRICE", "An item has no current price and cannot be purchased.");
+      }
+      merchandise += variant.priceMinor * line.quantity;
+    }
+    const quote: CartQuote = {
+      currency: "INR",
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+      lines: body.lines.map((l) => ({ ...l })),
+      merchandiseMinor: merchandise,
+      // Demo market: shipping and tax are simulated zeros, not exemptions.
+      mode: "DEMO",
+      quoteId: crypto.randomUUID(),
+      quoteVersion: 1,
+      sessionId: session.sessionId,
+      sessionVersion: session.sessionVersion,
+      shippingMinor: 0,
+      taxMinor: 0,
+      totalMinor: merchandise,
+    };
+    this.quotes.set(quote.quoteId, structuredClone(quote));
+    return { data: quote };
+  }
+
+  confirmCheckout(body: CheckoutConfirm, scripted: DemoOutcome): FixtureResult<OrderSnapshot> {
+    const quote = this.quotes.get(body.quoteId);
+    if (!quote) return fail(404, "NOT_FOUND", "Unknown fixture quote.");
+    const session = this.sessions.get(quote.sessionId);
+    if (!session) return fail(404, "NOT_FOUND", "Unknown fixture session.");
+    if (body.expectedSessionVersion !== session.sessionVersion) {
+      return fail(409, "STALE_SESSION", "Refresh this session.");
+    }
+    if (body.expectedQuoteVersion !== quote.quoteVersion) {
+      return fail(409, "STALE_QUOTE", "Prices changed. Request a new quote.");
+    }
+    if (body.confirmedTotalMinor !== quote.totalMinor) {
+      return fail(409, "TOTAL_MISMATCH", "The confirmed total no longer matches the quote.");
+    }
+    const order: FixtureOrder = {
+      snapshot: {
+        currency: quote.currency,
+        lines: structuredClone(quote.lines),
+        mode: "DEMO",
+        orderId: crypto.randomUUID(),
+        orderVersion: 1,
+        returnStatus: "NONE",
+        status: "PAYMENT_PENDING",
+        tenantId: session.tenantId,
+        totalMinor: quote.totalMinor,
+      },
+      lines: structuredClone(quote.lines),
+      scripted,
+      paymentUnknown: scripted === "TIMEOUT",
+      stage: "PENDING",
+    };
+    this.orders.set(order.snapshot.orderId, order);
+    if (scripted === "SUCCESS") return { data: this.settle(order, quote.totalMinor) };
+    if (scripted === "DECLINE") {
+      order.snapshot.status = "CANCELLED";
+      order.stage = "CLOSED";
+      return { data: structuredClone(order.snapshot) };
+    }
+    return { data: structuredClone(order.snapshot) };
+  }
+
+  private settle(order: FixtureOrder, totalMinor: number): OrderSnapshot {
+    order.snapshot.status = "PAID";
+    order.snapshot.status = "ALLOCATED";
+    order.stage = "ACTIVE";
+    order.snapshot.totalMinor = totalMinor;
+    return structuredClone(order.snapshot);
+  }
+
+  getOrder(orderId: string): FixtureResult<OrderSnapshot> {
+    const order = this.orders.get(orderId);
+    if (!order) return fail(404, "NOT_FOUND", "Unknown fixture order.");
+    return { data: structuredClone(order.snapshot) };
+  }
+
+  approveDemoAuth(orderId: string): FixtureResult<OrderSnapshot> {
+    const order = this.orders.get(orderId);
+    if (!order) return fail(404, "NOT_FOUND", "Unknown fixture order.");
+    if (order.snapshot.status !== "PAYMENT_PENDING") {
+      return fail(409, "INVALID_STATE", "No pending demo authentication for this order.");
+    }
+    return { data: this.settle(order, order.snapshot.totalMinor) };
+  }
+
+  rejectDemoAuth(orderId: string): FixtureResult<OrderSnapshot> {
+    const order = this.orders.get(orderId);
+    if (!order) return fail(404, "NOT_FOUND", "Unknown fixture order.");
+    if (order.snapshot.status !== "PAYMENT_PENDING") {
+      return fail(409, "INVALID_STATE", "No pending demo authentication for this order.");
+    }
+    order.snapshot.status = "CANCELLED";
+    order.stage = "CLOSED";
+    return { data: structuredClone(order.snapshot) };
+  }
+
+  reconcileDemoTimeout(orderId: string): FixtureResult<OrderSnapshot> {
+    const order = this.orders.get(orderId);
+    if (!order) return fail(404, "NOT_FOUND", "Unknown fixture order.");
+    if (!order.paymentUnknown) return fail(409, "INVALID_STATE", "Nothing to reconcile.");
+    order.snapshot.status = "CANCELLED";
+    order.stage = "CLOSED";
+    order.paymentUnknown = false;
+    return { data: structuredClone(order.snapshot) };
+  }
+
+  cancelOrder(orderId: string, body: OrderAction): FixtureResult<OrderSnapshot> {
+    const order = this.orders.get(orderId);
+    if (!order) return fail(404, "NOT_FOUND", "Unknown fixture order.");
+    if (body.expectedOrderVersion !== order.snapshot.orderVersion) {
+      return fail(409, "STALE_ORDER", "Refresh this order.");
+    }
+    if (order.snapshot.status === "SHIPPED" || order.snapshot.status === "DELIVERED") {
+      return fail(409, "SHIPPED", "Shipped orders use the return flow instead.");
+    }
+    if (order.snapshot.status === "CANCELLED" || order.snapshot.status === "REFUNDED") {
+      return { data: structuredClone(order.snapshot) };
+    }
+    order.snapshot.status = "REFUNDED";
+    order.stage = "CLOSED";
+    return { data: structuredClone(order.snapshot) };
+  }
+
+  advanceFulfilment(orderId: string, body: FulfilmentAction): FixtureResult<OrderSnapshot> {
+    const order = this.orders.get(orderId);
+    if (!order) return fail(404, "NOT_FOUND", "Unknown fixture order.");
+    if (body.expectedOrderVersion !== order.snapshot.orderVersion) {
+      return fail(409, "STALE_ORDER", "Refresh this order.");
+    }
+    const ladder: Partial<Record<OrderSnapshot["status"], OrderSnapshot["status"]>> = {
+      ALLOCATED: "PICKED",
+      PICKED: "SHIPPED",
+      SHIPPED: "DELIVERED",
+    };
+    const next = ladder[order.snapshot.status];
+    if (!next || next !== body.nextStatus) {
+      return fail(409, "INVALID_STATE", `Cannot advance from ${order.snapshot.status} to ${body.nextStatus}.`);
+    }
+    order.snapshot.status = next;
+    order.snapshot.orderVersion += 1;
+    if (next === "DELIVERED") order.stage = "DELIVERED";
+    return { data: structuredClone(order.snapshot) };
+  }
+
+  requestReturn(orderId: string, body: OrderAction): FixtureResult<OrderSnapshot> {
+    const order = this.orders.get(orderId);
+    if (!order) return fail(404, "NOT_FOUND", "Unknown fixture order.");
+    if (body.expectedOrderVersion !== order.snapshot.orderVersion) {
+      return fail(409, "STALE_ORDER", "Refresh this order.");
+    }
+    if (order.snapshot.status !== "DELIVERED") {
+      return fail(409, "NOT_DELIVERED", "Returns open after delivery.");
+    }
+    order.snapshot.returnStatus = "REQUESTED";
+    order.snapshot.orderVersion += 1;
+    return { data: structuredClone(order.snapshot) };
+  }
+
+  receiveReturn(orderId: string, body: OrderAction): FixtureResult<OrderSnapshot> {
+    const order = this.orders.get(orderId);
+    if (!order) return fail(404, "NOT_FOUND", "Unknown fixture order.");
+    if (body.expectedOrderVersion !== order.snapshot.orderVersion) {
+      return fail(409, "STALE_ORDER", "Refresh this order.");
+    }
+    if (order.snapshot.returnStatus !== "REQUESTED") {
+      return fail(409, "INVALID_STATE", "No return requested for this order.");
+    }
+    order.snapshot.status = "REFUNDED";
+    order.snapshot.returnStatus = "RECEIVED";
+    order.stage = "CLOSED";
+    order.snapshot.orderVersion += 1;
+    return { data: structuredClone(order.snapshot) };
+  }
+
+  listOrders(): OrderSnapshot[] {
+    return [...this.orders.values()].map((o) => structuredClone(o.snapshot));
+  }
+
+  /** Demo outcome of an order, for honest operator-style labelling in the UI. */
+  orderScript(orderId: string): DemoOutcome | null {
+    return this.orders.get(orderId)?.scripted ?? null;
+  }
+
+  orderPaymentUnknown(orderId: string): boolean {
+    return this.orders.get(orderId)?.paymentUnknown ?? false;
+  }
+
+  claimSession(body: ClaimSession): FixtureResult<SessionSnapshot> {
+    const session = this.sessions.get(body.sessionId);
+    if (!session) return fail(404, "NOT_FOUND", "Unknown fixture session.");
+    if (body.expectedSessionVersion !== session.sessionVersion) {
+      return fail(409, "STALE_SESSION", "Refresh this session.");
+    }
+    const next: SessionSnapshot = { ...session, sessionVersion: session.sessionVersion + 1 };
+    this.sessions.set(body.sessionId, next);
+    this.claimedSessions.add(body.sessionId);
+    return { data: structuredClone(next) };
+  }
+
+  isClaimed(sessionId: string): boolean {
+    return this.claimedSessions.has(sessionId);
+  }
+
+  saveWardrobeItem(body: WardrobeSave): FixtureResult<WardrobeItem> {
+    const key = `${body.reference.slot}:${body.reference.refId}`;
+    const existing = this.wardrobe.get(key);
+    const item: WardrobeItem = {
+      wardrobeId: existing?.wardrobeId ?? crypto.randomUUID(),
+      reference: body.reference,
+      ownedQuantity: (existing?.ownedQuantity ?? 0) - (existing?.manualOwnedQuantity ?? 0) + body.manualOwnedQuantity,
+      orderedQuantity: existing?.orderedQuantity ?? 0,
+      manualOwnedQuantity: body.manualOwnedQuantity,
+      saved: body.saved,
+      provenance: [...new Set([...(existing?.provenance ?? []), "manual entry"])],
+    };
+    if (item.ownedQuantity < 0) item.ownedQuantity = 0;
+    this.wardrobe.set(key, item);
+    return { data: structuredClone(item) };
+  }
+
+  listWardrobe(): FixtureResult<WardrobePage> {
+    const items = new Map<string, WardrobeItem>();
+    for (const manual of this.wardrobe.values()) {
+      items.set(`${manual.reference.slot}:${manual.reference.refId}`, structuredClone(manual));
+    }
+    for (const order of this.orders.values()) {
+      for (const line of order.lines) {
+        const slot = VARIANTS.find((v) => v.variantId === line.variantId)?.slot ?? "TOP";
+        const key = `${slot}:${line.variantId}`;
+        const existing = items.get(key);
+        const base: WardrobeItem = existing ?? {
+          wardrobeId: crypto.randomUUID(),
+          reference: { slot, refType: "VARIANT", refId: line.variantId },
+          ownedQuantity: 0,
+          orderedQuantity: 0,
+          manualOwnedQuantity: 0,
+          saved: false,
+          provenance: [],
+        };
+        if (order.stage === "ACTIVE") {
+          base.orderedQuantity += line.quantity;
+          base.provenance.push(`ordered in demo order ${order.snapshot.orderId.slice(0, 8)}`);
+        }
+        if (order.stage === "DELIVERED") {
+          base.ownedQuantity += line.quantity;
+          base.provenance.push(`delivered by demo order ${order.snapshot.orderId.slice(0, 8)}`);
+        }
+        base.provenance = [...new Set(base.provenance)];
+        items.set(key, base);
+      }
+    }
+    return { data: { items: [...items.values()], nextCursor: null } };
   }
 }
 
