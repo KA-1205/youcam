@@ -208,3 +208,13 @@ legend { font-weight: 600; padding: 0 0.4rem; }
 .compare-table thead th { border-top: none; font-size: 0.9rem; }
 .compare-table tbody th { text-transform: capitalize; color: var(--plum-soft); white-space: nowrap; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Preview workspace */
+.tab-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tab { border: 1px solid var(--line); background: var(--ivory-raised); border-radius: 999px; padding: 0.35rem 0.8rem; font: inherit; cursor: pointer; }
+.tab--active { border-color: var(--rose); background: var(--rose-soft); font-weight: 600; }
+.preview-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 40rem) { .preview-pair { grid-template-columns: 1fr; } }
+.preview-frame { border: 1px dashed var(--line); border-radius: 0.75rem; background: var(--ivory-raised); min-height: 10rem; display: grid; place-items: center; color: var(--plum-soft); }
+.preview-frame--empty { background: repeating-linear-gradient(45deg, #f7f1e6, #f7f1e6 12px, #f2ebdd 12px, #f2ebdd 24px); }
+.preview-pair figcaption { margin-top: 0.4rem; }
