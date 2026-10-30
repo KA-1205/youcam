@@ -1,0 +1,3597 @@
+[
+  {
+    "id": "FR-001",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Every catalog, membership, session, order and job is tenant-scoped; another tenant's identifiers fail without disclosing its data.",
+    "tickets": [
+      "C01",
+      "B01"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-002",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Roles: owner (staff, limits, billing), editor (catalog), stylist (explicitly shared sessions), warehouse operator (fulfilment), shopper (own data), brand partner (own products). Roles cannot grant themselves privileges.",
+    "tickets": [
+      "C01",
+      "B01"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-003",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Guests can explore without signup; durable saving, sharing and checkout require a verified account, and guest data never attaches to the wrong account.",
+    "tickets": [
+      "C01",
+      "B01"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-004",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "The tenant enables only supported categories; disabled categories vanish from selection while history stays readable.",
+    "tickets": [
+      "C01",
+      "B01"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-005",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Imports go to staging with per-row errors and duplicate handling; nothing publishes until identity, category, price/currency (or an explicit unknown-price state), URL and media fields are valid.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-006",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Products and variants are distinct (size, colour, foundation formula/shade, jewellery metal and length); every buyable item has a stable variant ID.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-007",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "The storefront publishes only own-brand and sponsor-brand variants; each shows brand and partner status, and the entry page states this scope.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-008",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Price and stock source, checked time and freshness are tracked; stale data is labelled and unavailable variants are never offered as purchasable.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-009",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "All published own-brand and sponsor-brand catalog images are assumed authorized for display and YouCam processing (D-06). Store rights/provenance and technical suitability; unsuitable assets remain searchable but non-previewable.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-010",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Catalog records are published, withdrawn and revised with audit history; saved looks keep the original version and show withdrawn or stale status.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-011",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Garment matching attributes (neckline, colour, formality) and jewellery attributes (type, metal, style, length) are stored; unknown values stay unknown.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-012",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Commerce-platform connectors sync variants and offers under explicit conflict rules; the storefront can be embedded as a widget on merchant pages.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-013",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "A catalog item or manually confirmed owned item can be an anchor; recognition from an uploaded item is only a suggestion until confirmed.",
+    "tickets": [
+      "C02",
+      "A02",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-014",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "More than one anchor may be set; conflicts between anchors are shown and resolved by the shopper.",
+    "tickets": [
+      "C02",
+      "A02",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-015",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Items are marked owned or to-buy; owned quantities count zero toward new spend.",
+    "tickets": [
+      "C02",
+      "A02",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-016",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Variant selections can be locked; refresh, ranking, stylist proposals and swaps cannot replace them without a visible unlock request.",
+    "tickets": [
+      "C02",
+      "A02",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-017",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Changing the anchor creates a new session version, invalidates dependent suggestions and previews, and keeps prior versions inspectable while retained.",
+    "tickets": [
+      "C02",
+      "A02",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-018",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "The brief captures occasion, desired categories, budget and currency, hard requirements and flexible preferences; unknown values stay unknown.",
+    "tickets": [
+      "C02",
+      "A02",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-019",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Edits persist with optimistic concurrency; stale writes produce a conflict for review.",
+    "tickets": [
+      "C02",
+      "A02",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-020",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Selected, locked, rejected and saved items are tracked; a rejected item does not return in the same session unless reconsidered.",
+    "tickets": [
+      "C02",
+      "A02",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-021",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Locks guarantee product-selection stability only, never pixel preservation in a generated render, and the UI keeps those meanings separate.",
+    "tickets": [
+      "C02",
+      "A02",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-022",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Tenant scope, published status, selected variants, requested categories and hard budget are applied before ranking; no invented SKUs and no unannounced constraint relaxation.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-023",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Return zero to three looks with identifiable items, itemized spend and explanations tied to actual preferences and catalog data; do not manufacture options.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-024",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Explain differences (lower cost, preferred coverage, different accessory style); never claim objective attractiveness or infer personality from a face.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-025",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Swapping one category preserves the anchor and other locks, recomputes the total, invalidates only affected results and records why the candidate changed.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-026",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "When no combination exists, show the blocking constraint and a user-controlled adjustment; never silently exceed budget or present a wrong-size variant as available in the requested size.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-027",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Store engine and catalog versions and normalized inputs for reproducibility; eligibility, arithmetic and validation are deterministic. AI stylist proposals/reviews may vary; retain a frozen non-agent baseline for evaluation and labelled outage fallback. Record model/prompt versions, candidate snapshot, inputs and actual outputs rather than promise exact regeneration (D-10).",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-028",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Inspiration-image retrieval returns catalog candidates with similarity reasons; the shopper chooses which visual elements matter.",
+    "tickets": [
+      "A05",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-029",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "The D-10 AI stylist is the selected proposal/review approach, subject to schema and hard-constraint tests. A separately trained or learned ranker replacing it remains gated on participant-separated evaluation against the frozen baseline, measurable usefulness gains and zero hard-constraint violations.",
+    "tickets": [
+      "A04",
+      "A08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-030",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Budget totals are merchandise subtotals in one tenant currency; shipping/tax are separately shown at checkout. Apply all five unknown-price rules in D-01. Price changes trigger revalidation; size-label matching is filtering, not a fit prediction.",
+    "tickets": [
+      "A02",
+      "A07",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-031",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Show brand and partner status. Sponsorship never boosts normal ranking. Paid promotions are separate, labelled \u201cSponsored\u201d, and subject to applicable hard constraints, locks and budget (D-09).",
+    "tickets": [
+      "A02",
+      "A07",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-032",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Suggest jewellery sets (earrings, necklace, and other catalog jewellery) for a look using garment attributes, merchant pairing rules and explicit shopper preferences; nothing is inferred from face, skin tone or body.",
+    "tickets": [
+      "A05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-033",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Show the garment attributes used and let the shopper edit them; attributes recognised from an uploaded owned item are confirmed first.",
+    "tickets": [
+      "A05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-034",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Metal, style and jewellery budget are optional and default to unspecified; skin tone never sets or narrows metal or colour.",
+    "tickets": [
+      "A05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-035",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Return zero to three sets with exact variants, itemized spend and a reason; items missing hard-required attributes are excluded; missing optional attributes remain UNKNOWN and cannot support factual claims.",
+    "tickets": [
+      "A05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-036",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Per item, show preview availability; items without a validated preview capability are labelled \"product only\".",
+    "tickets": [
+      "A05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-037",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Lock and swap individual jewellery items; a garment change invalidates dependent suggestions and flags locked jewellery for recheck.",
+    "tickets": [
+      "A05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-038",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Merchants define pairing and exclusion rules.",
+    "tickets": [
+      "A05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-039",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Resolve an exact brand/formula/shade or store an unsupported reference; never substitute a similarly named shade silently.",
+    "tickets": [
+      "A05",
+      "C01",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-040",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Record shade feedback independently from finish, coverage and wear.",
+    "tickets": [
+      "A05",
+      "C01",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-041",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Offer similar-shade, lower-cost and different-formula alternatives using catalog provenance and stated experience; sampled website colours are labelled approximate.",
+    "tickets": [
+      "A05",
+      "C01",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-042",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Users with no existing foundation get exploratory suggestions; conflicting or inadequate evidence yields a clarification or insufficient-evidence state.",
+    "tickets": [
+      "A05",
+      "C01",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-043",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Photo analysis is optional and asks about makeup status; a covered face never becomes a bare-skin measurement; no oxidation diagnosis from one image.",
+    "tickets": [
+      "A05",
+      "C01",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-044",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Label evidence as source-documented, user-reported or image-estimated; show no numeric match probability or \"certified shade\" badge.",
+    "tickets": [
+      "A05",
+      "C01",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-045",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "A Wear Diary records dates, conditions and subjective outcomes; physical-swatch calibration is **gated** on held-out validation that shows benefit.",
+    "tickets": [
+      "A05",
+      "C01",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-046",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Obtain explicit image-processing consent before any transfer; photo refusal preserves non-photo discovery and comparison.",
+    "tickets": [
+      "C04",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-047",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Request captures by capability (clothing needs the body region; makeup needs a selfie; earrings and other jewellery need the relevant visible area; hair colour needs visible hair); one image is never promised to work for every capability.",
+    "tickets": [
+      "C04",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-048",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Validate format, dimensions, size and suitability locally and from the provider response, and explain what to recapture.",
+    "tickets": [
+      "C04",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-049",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Clothing, makeup, earrings, other jewellery and hair colour are independently viewable on a look board; each result records source, variant or effects, settings and status.",
+    "tickets": [
+      "C05",
+      "C06",
+      "C07",
+      "B04",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-050",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Show original and generated previews labelled \"illustrative preview\"; no size, identity or shade guarantee.",
+    "tickets": [
+      "C05",
+      "C06",
+      "C07",
+      "B04",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-051",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Compare candidates within a category using the same source and settings; never stack alternative foundations.",
+    "tickets": [
+      "C05",
+      "C06",
+      "C07",
+      "B04",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-052",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "A failed category shows a local error with retry; other categories and selections remain usable.",
+    "tickets": [
+      "C05",
+      "C06",
+      "C07",
+      "B04",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-053",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "New selections or consent withdrawal prevent late results from appearing as current; retained history is versioned.",
+    "tickets": [
+      "C05",
+      "C06",
+      "C07",
+      "B04",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-054",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "A combined full-look image is **gated** on testing edit order and preservation; if later calls materially alter earlier products or appearance, fall back to separate previews.",
+    "tickets": [
+      "C05",
+      "C06",
+      "C07",
+      "B04",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-055",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "QA is implemented with optional operator review and flags unintended changes outside requested regions and obvious product-detail loss; a passed check certifies nothing.",
+    "tickets": [
+      "C05",
+      "C06",
+      "C07",
+      "B04",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-056",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Capabilities not yet validated on the account (for example necklace, ring, bracelet, watch or hair-colour previews) are **gated** and shown as product-only until proven by real-account calls.",
+    "tickets": [
+      "C05",
+      "C06",
+      "C07",
+      "B04",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-057",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Compare up to three looks with exact products, owned/to-buy labels, subtotal, missing fields and preview availability.",
+    "tickets": [
+      "C02",
+      "C04",
+      "B03",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-058",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Save versioned shortlists; reload restores selections and constraints; expired media offers explicit, consented, cost-checked regeneration; never regenerate automatically.",
+    "tickets": [
+      "C02",
+      "C04",
+      "B03",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-059",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Private shares are scoped and revocable, exclude photos unless selected, and warn that downloads cannot be recalled.",
+    "tickets": [
+      "C02",
+      "C04",
+      "B03",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-060",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Export a lookbook (image or PDF) with exact products, price timestamps and illustrative-preview labels; collections group saved looks.",
+    "tickets": [
+      "C02",
+      "C04",
+      "B03",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-061",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "shopper-profile owns saved/ordered/owned wardrobe records and transitions (D-04). Adding is a user action; purchase and delivery events come from commerce. Ordered becomes owned on delivery or shopper confirmation; previews never establish ownership. Consume duplicate events idempotently.",
+    "tickets": [
+      "C01",
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-062",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Explicit preferences and owned products are stored with editable provenance; actual-try feedback by category (shade/formula, clothing fit/comfort, accessory appearance) is recorded and its effect on future suggestions is explained.",
+    "tickets": [
+      "C01",
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-063",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "One-click purchase needs required variant options (size where applicable), a saved address and saved payment method; confirmation shows itemized merchandise, shipping, tax and total, and one explicit confirm places the order.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-064",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Price and stock are rechecked at confirm; changes require reconfirmation.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-065",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "A look can be bought whole or in part; owned items are excluded; mixed availability is shown per item.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-066",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Payments use the replaceable gateway contract in D-03, initially a labelled demo implementation simulating success, decline, authentication-required and timeout. Real providers require server-side configuration, contract tests and integration verification.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-067",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Local idempotency keys prevent duplicate charges; webhooks are verified; ambiguous timeouts are reconciled before retry.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-068",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "The local demo collects no card details and uses synthetic payment references. Future live card entry uses gateway-hosted fields; store only gateway tokens with separate consent, never card numbers.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-069",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Orders move through created, payment-pending, paid, allocated, picked, shipped, delivered, cancelled and refunded (demo); inventory is reserved with an expiry. Implement the simulated outcome table in Behavior Contract \u00a75; detailed real-payment recovery and compensation are required before live activation (D-11).",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-070",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Stock checks, reservations/releases, order submission and fulfilment updates use the replaceable own-warehouse contract (D-03), initially labelled \u201cSimulated fulfilment\u201d. Verify a live implementation before activation; never present a demo as live.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-071",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Shoppers see order confirmation and status and can cancel before shipment; returns and refunds follow a policy set before any live sale.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-072",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Stylists can propose items but never place orders for shoppers.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-073",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "The shopper chooses to submit a session with a visible sharing scope; staff never get automatic access to sessions or photos.",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-074",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Queue states: submitted, assigned, proposal-ready, accepted/rejected, closed; staff cannot promise availability or response times not configured by the merchant.",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-075",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "A proposal contains notes and a base version. Each lock replacement or shopper-controlled constraint change needs its own explicit approval (D-05), followed by revalidation; non-overridable system rules remain enforced.",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-076",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Show a diff and require acceptance before creating a new version. Apply D-07 to outdated proposals: automatic validity check, no overwritten newer edits, shopper-approved refresh request if conflicting, separate acceptance of the refreshed advice, and a final version check.",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-077",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Appointment and live-consultation workflows let both sides view the same session version; changes made live are versioned proposals.",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-078",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Merchants configure branding, enabled categories, approved merchandising rules and usage caps.",
+    "tickets": [
+      "A07",
+      "A08",
+      "C07",
+      "C08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-079",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "The dashboard reports qualified sessions, generated looks, saves, product clicks, stylist requests, orders and provider units; every metric defines its denominator and time window; small cohorts are suppressed under a documented threshold.",
+    "tickets": [
+      "A07",
+      "A08",
+      "C07",
+      "C08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-080",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Purchase attribution uses first-party orders only; clicks, saves and carts are never reported as purchases; demo orders are flagged and excluded from revenue claims.",
+    "tickets": [
+      "A07",
+      "A08",
+      "C07",
+      "C08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-081",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Staff can inspect sanitized job failures and retry within permission and budget limits; raw photos are not in default analytics or support logs.",
+    "tickets": [
+      "A07",
+      "A08",
+      "C07",
+      "C08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-082",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Enforce tenant allowance and concurrency limits before provider submission; a usage ledger records reserved, actual, released and unresolved charges.",
+    "tickets": [
+      "A07",
+      "A08",
+      "C07",
+      "C08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-083",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Merchant plans, invoices, overages and spending controls run through the payment adapter (demo until a provider is validated), with cost reconciliation and cancellation.",
+    "tickets": [
+      "A07",
+      "A08",
+      "C07",
+      "C08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-084",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "A server-side adapter calls provider REST APIs; keys stay server-side; official skills and MCP resources are development aids, not production dependencies.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-085",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Job states: created, queued, submitted, running, succeeded, failed, timed-out; cancellation is local and may not stop provider processing or billing, and this is recorded.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-086",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Idempotency keys prevent duplicate local submissions (provider-side idempotency is not assumed); retry only known-retryable failures with bounded backoff; reconcile ambiguous submissions before resubmitting.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-087",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Estimate and reserve cost before calls and reconcile against observed provider usage; verify webhook authenticity where supported, otherwise poll; an unsolicited callback alone never exposes a result.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-088",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Cache by tenant, permission, source digest, capability/version, exact settings and retention; never share personal image cache across shoppers; lock changes and unrelated accessory swaps do not trigger re-analysis.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-089",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Shopper-optional conversational assistant (required implementation): calls the same tools, resolves facts to catalog records, validates arguments server-side, requires explicit actions for sharing and purchase, never invents SKUs, prices, stock or medical claims, and treats prompt-like product text as untrusted data.",
+    "tickets": [
+      "A05",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-090",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Separate consent for processing photos, saving photos/renders, stylist sharing, research use, notifications, saving address, and saving payment token.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-091",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Unsaved photos and renders live in transient first-party storage for at most 24 hours; long-term retention is explicit opt-in with visible expiry and deletion; stylist access never implies training consent.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-092",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "On deletion, revoke access immediately and queue first-party removal; document provider-side retention limits; remove active-system personal data within seven days and disclose backup expiry.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-093",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Use private media storage with short-lived signed access; strip unnecessary image metadata, validate uploaded bytes, and restrict server-side URL fetching.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-094",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Keep secrets, photos, signed URLs, addresses, payment tokens and personal notes out of analytics and logs; support access to photos needs explicit scope and auditing.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-095",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Demo and model photographs must have consent and licences covering the intended use; public images are not assumed reusable.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-096",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Target WCAG 2.2 AA: keyboard navigation, focus visibility, labelled uploads and text equivalents for colour choices; no permanent viewport lock; usable phone capture.",
+    "tickets": [
+      "B01",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "FR-097",
+    "source": "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md",
+    "requirement": "Provide clear states for each edge case listed above, with honest queued and running status and no invented progress percentages.",
+    "tickets": [
+      "B01",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-001",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to open the retailer's hosted Anchor Fit page and understand what it does and which retailer's catalog is searched, so that I know the scope before I invest effort.",
+    "tickets": [
+      "C01",
+      "C02",
+      "A02",
+      "B01",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-002",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to start without signing up, so that I can explore with no friction.",
+    "tickets": [
+      "C01",
+      "C02",
+      "A02",
+      "B01",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-003",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to add an item I already own as my anchor, so that I can build a look around it.",
+    "tickets": [
+      "C01",
+      "C02",
+      "A02",
+      "B01",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-004",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to confirm or correct the category and attributes inferred from an uploaded owned item, so that a wrong recognition does not drive my recommendations.",
+    "tickets": [
+      "C01",
+      "C02",
+      "A02",
+      "B01",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-005",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to enter from a product page link with the exact variant preselected, so that I can build around the thing I was already looking at.",
+    "tickets": [
+      "C01",
+      "C02",
+      "A02",
+      "B01",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-006",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to confirm the variant and say whether I'm buying it or already own it, so that the budget is counted correctly.",
+    "tickets": [
+      "C01",
+      "C02",
+      "A02",
+      "B01",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-007",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to set an occasion, desired categories, budget with currency, hard requirements and flexible preferences, so that suggestions reflect my brief.",
+    "tickets": [
+      "C01",
+      "C02",
+      "A02",
+      "B01",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-008",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to leave any brief field unknown without being forced to guess, so that the system does not invent constraints for me.",
+    "tickets": [
+      "C01",
+      "C02",
+      "A02",
+      "B01",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-009",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want owned items excluded from the new-spend total, so that my budget reflects only what I will buy.",
+    "tickets": [
+      "C01",
+      "C02",
+      "A02",
+      "B01",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-010",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want items I plan to buy counted normally, including a catalog anchor I intend to purchase, so that the total is honest.",
+    "tickets": [
+      "C01",
+      "C02",
+      "A02",
+      "B01",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-011",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to see up to three eligible looks with identifiable items and itemized spend, so that I can compare real options.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-012",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want fewer than three looks when fewer qualify, rather than padded or invented options, so that I can trust what I see.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-013",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want each look explained in terms of my actual preferences and catalog data, so that I understand why it was suggested.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-014",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want differences between looks explained (lower cost, preferred coverage, different accessory style), so that I can choose on a meaningful trade-off.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-015",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want recommendations to never exceed my hard budget silently, so that I never feel tricked.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-016",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to be told which constraint blocks results when no combination exists, and offered an adjustment I control, so that I can decide how to proceed.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-017",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want sizes matched as a filter to my selection and never presented as a physical-fit prediction, so that I'm not misled about fit.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-018",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want the system not to infer my ethnicity, gender identity or what colors I \"should\" wear, so that I am treated as an individual.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-019",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want jewelry and clothing colors never forced by my skin tone, so that I keep full choice.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-020",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want unknown-price products searchable but excluded from new hard-budget recommendations, existing saved/locked selections preserved with an unverifiable-budget label, unknown-price purchases blocked, and owned items counted at zero (D-01).",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-021",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to see that shipping and tax are excluded from totals, so that I'm not surprised at checkout.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-022",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want stale price or stock data labeled and unavailable variants never offered as purchasable, so that I don't chase items I can't buy.",
+    "tickets": [
+      "A02",
+      "A03",
+      "A04",
+      "B02",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-023",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to lock a variant, so that refreshes, ranking, swaps and stylist proposals cannot replace it without my knowing.",
+    "tickets": [
+      "C02",
+      "A03",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-024",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to swap one category while the anchor and my other locks stay, so that I can iterate precisely.",
+    "tickets": [
+      "C02",
+      "A03",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-025",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want the total recomputed and only affected previews invalidated after a swap, so that I don't redo unrelated work.",
+    "tickets": [
+      "C02",
+      "A03",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-026",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to see why a swapped candidate was chosen, so that changes are not a black box.",
+    "tickets": [
+      "C02",
+      "A03",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-027",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a rejected item not to come back in the same session unless I reconsider it, so that I'm not shown things I already dismissed.",
+    "tickets": [
+      "C02",
+      "A03",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-028",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want changing the anchor to be a deliberate, visible action that creates a new session version, so that I never lose context by accident.",
+    "tickets": [
+      "C02",
+      "A03",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-029",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want previous session versions inspectable, so that I can go back to an earlier direction.",
+    "tickets": [
+      "C02",
+      "A03",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-030",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want the UI to distinguish \"this product stays selected\" from \"this pixel is preserved in the render\", so that I understand what a lock guarantees.",
+    "tickets": [
+      "C02",
+      "A03",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-031",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to give explicit consent before any photo is transferred for processing, so that I control my images.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-032",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to refuse photos and still explore, compare and save looks, so that privacy never blocks the core journey.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-033",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want capture guidance specific to clothing, makeup or earrings, so that I provide a photo that will work for each.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-034",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want bad photos (undecodable, too small, wrong body region, ears hidden) rejected with a clear recapture explanation, so that I know what to fix.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-035",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a clothing preview of selected products on my photo, so that I can judge the look.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-036",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a makeup preview of foundation, lipstick and blush, so that I can see beauty products on my face.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-037",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want an earrings preview from the catalog reference, so that I can see accessory options.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-038",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want each category's result viewable independently on a look board, so that one failure does not hide the rest.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-039",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want original and generated previews shown side by side labeled \"illustrative preview\", so that I don't take it as a guarantee.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-040",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want alternatives in a category compared against the same original photo and settings, so that the comparison is fair.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-041",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want alternative foundations never stacked on each other, so that previews aren't corrupted.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-042",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a failed category to show a local error with retry while other previews and selections stay, so that partial success is preserved.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-043",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a late result from an outdated selection never shown as current, and likewise after I withdraw consent, so that I only see valid results.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-044",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a warning when a preview appears to change areas I didn't ask to change, so that I can discount it.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-045",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a combined full-look image only if it demonstrably preserves earlier edits, otherwise separate previews, so that I'm not shown distorted composites.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-046",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want honest queued/running states without made-up progress percentages, so that I know what is really happening.",
+    "tickets": [
+      "C04",
+      "C05",
+      "C07",
+      "B04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-047",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to select my existing foundation by brand, formula and shade, so that I have a precise reference.",
+    "tickets": [
+      "A05",
+      "C01",
+      "C06",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-048",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want an unsupported foundation stored as an unsupported reference rather than silently replaced by a similarly named shade, so that I'm never given the wrong anchor.",
+    "tickets": [
+      "A05",
+      "C01",
+      "C06",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-049",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to record whether the shade works independently of finish, coverage and wear, so that \"shade works, finish too matte\" keeps both facts.",
+    "tickets": [
+      "A05",
+      "C01",
+      "C06",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-050",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to choose \"similar shade\", \"lower-cost option\" or \"different formula\", so that results match my goal.",
+    "tickets": [
+      "A05",
+      "C01",
+      "C06",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-051",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want recommendations tied to catalog provenance and my stated experience, so that I can see the basis.",
+    "tickets": [
+      "A05",
+      "C01",
+      "C06",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-052",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want sampled website colors labeled approximate, so that I don't over-trust them.",
+    "tickets": [
+      "A05",
+      "C01",
+      "C06",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-053",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper without an existing foundation, I want exploratory suggestions, so that I can still use the path.",
+    "tickets": [
+      "A05",
+      "C01",
+      "C06",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-054",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a clarification or insufficient-evidence message when evidence conflicts or is inadequate, so that I'm not given false certainty.",
+    "tickets": [
+      "A05",
+      "C01",
+      "C06",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-055",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want photo analysis to be optional and to be asked whether I'm wearing makeup, so that a covered face is never treated as bare skin.",
+    "tickets": [
+      "A05",
+      "C01",
+      "C06",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-056",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want evidence labeled source-documented, user-reported or image-estimated, so that I know how strong each claim is.",
+    "tickets": [
+      "A05",
+      "C01",
+      "C06",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-057",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want no numeric match probability or \"certified shade\" badge, so that I'm not given unsupported precision.",
+    "tickets": [
+      "A05",
+      "C01",
+      "C06",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-058",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to pin a chosen beauty product into a broader look, or finish a beauty-only journey, so that the path fits my goal.",
+    "tickets": [
+      "A05",
+      "C01",
+      "C06",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-059",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to compare up to three looks with exact products, owned/to-buy labels, subtotal, missing fields and preview availability, so that I can decide.",
+    "tickets": [
+      "C01",
+      "C02",
+      "C04",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-060",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to save a versioned shortlist that restores product selections and constraints on reload, so that I can come back.",
+    "tickets": [
+      "C01",
+      "C02",
+      "C04",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-061",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want expired preview media to prompt regeneration rather than show a broken image as current, so that the shortlist stays trustworthy.",
+    "tickets": [
+      "C01",
+      "C02",
+      "C04",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-062",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want product links to open the correct Anchor Fit catalog variant, with freshness rechecked before checkout, so that I land on what I chose.",
+    "tickets": [
+      "C01",
+      "C02",
+      "C04",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-063",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a private share link that is scoped and revocable, with my photos excluded unless I select them, so that I control what others see.",
+    "tickets": [
+      "C01",
+      "C02",
+      "C04",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-064",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a warning that downloaded files cannot be recalled, so that I understand the limits of revocation.",
+    "tickets": [
+      "C01",
+      "C02",
+      "C04",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-065",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want durable saving to explain the account or verified-access requirement, so that I know why I'm asked to sign in.",
+    "tickets": [
+      "C01",
+      "C02",
+      "C04",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-066",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a guest, I want my guest data never attached to the wrong account, so that sessions stay private.",
+    "tickets": [
+      "C01",
+      "C02",
+      "C04",
+      "B03"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-067",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want my explicit preferences and owned items stored with editable provenance, so that I can correct them.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-068",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a previewed item never marked as owned or physically tried, so that my shelf stays truthful.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-069",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to record actual-try feedback by category (shade/formula, clothing fit/comfort, accessory appearance), so that future suggestions improve.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-070",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to be told how my feedback affects future personal suggestions, so that the effect is transparent.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-071",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want separate consent for processing photos, saving photos/renders, stylist sharing, research use, notifications, saving address and saving payment token, so that each is my own decision.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-072",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want unsaved photos and renders removed from first-party storage within 24 hours by default, so that my images are not kept needlessly.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-073",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want long-term photo retention to be explicit opt-in with a visible expiry and deletion controls, so that I'm in charge.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-074",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want access revoked immediately when I delete data or my account, with active personal data removed within seven days, so that deletion is real and fast.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-075",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want provider-side retention limits documented honestly rather than promised away, so that I understand what deletion covers.",
+    "tickets": [
+      "C01",
+      "C04",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-076",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to choose whether to submit a session to the stylist and see the sharing scope, including whether photos are included, so that staff never see my data automatically.",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-077",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a stylist, I want a queue of submitted sessions with states (submitted, assigned, proposal-ready, accepted/rejected, closed), so that I can manage my work.",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-078",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a stylist, I want to see the anchor, constraints, selections, earlier rejections and shared evidence, so that I don't restart discovery.",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-079",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a stylist, I want to create a proposal with notes linked to the exact session version I reviewed, so that my suggestion is traceable.",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-080",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want each locked-item replacement and shopper-controlled hard-constraint change explicitly approved separately before application and revalidation, so that general proposal acceptance never hides an exception (D-05).",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-081",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to see a diff of the proposal and accept or reject it, so that I stay in control.",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-082",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want outdated proposals automatically checked against my current look, conflicts explained, my approval before a refresh is requested, and separate acceptance of refreshed advice, so that my latest edits are preserved (D-07).",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-083",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want an accepted proposal revalidated for budget, catalog and availability, so that it is still valid.",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-084",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant, I want staff unable to promise availability or response times that I haven't configured, so that customer expectations are honest.",
+    "tickets": [
+      "A06",
+      "C01",
+      "C02",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-085",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a catalog editor, I want to import a CSV into staging with per-row errors and duplicate handling, so that bad data never reaches shoppers.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-086",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a catalog editor, I want nothing published until identity, category, price/currency (or an explicit unknown-price state), URL and media fields are valid, so that published records are complete.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-087",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a catalog editor, I want product and variant kept distinct (size, color, foundation formula/shade), so that every buyable item has a stable variant ID.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-088",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a catalog editor, I want price and stock source, checked time and freshness tracked, so that staleness is visible.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-089",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a catalog editor, I want image rights, source and per-category provider suitability recorded, so that a garment image is not wrongly used as an earring reference.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-090",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a catalog editor, I want unsupported assets to stay searchable but marked non-previewable, so that useful products aren't hidden.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-091",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a catalog editor, I want to publish, withdraw and revise records with audit history, so that changes are accountable.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-092",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want an existing saved look to retain its original product version but show withdrawn or stale status, so that history is preserved without misleading me.",
+    "tickets": [
+      "A01",
+      "A07",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-093",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want to create a tenant and assign roles (owner, editor, stylist), so that the team has the right permissions.",
+    "tickets": [
+      "C01",
+      "C07",
+      "C08",
+      "A07",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-094",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want to enable only the categories my store supports, so that a clothing-only store never shows a fictional makeup catalog.",
+    "tickets": [
+      "C01",
+      "C07",
+      "C08",
+      "A07",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-095",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want disabled categories to vanish from shopper selection while historical records remain readable, so that history isn't corrupted.",
+    "tickets": [
+      "C01",
+      "C07",
+      "C08",
+      "A07",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-096",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want to configure branding, currency and usage allowances, so that the experience is mine and cost-controlled.",
+    "tickets": [
+      "C01",
+      "C07",
+      "C08",
+      "A07",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-097",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want usage and concurrency limits enforced before any provider call, so that I don't incur surprise cost.",
+    "tickets": [
+      "C01",
+      "C07",
+      "C08",
+      "A07",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-098",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want a usage ledger showing reserved, actual, released and unresolved charges, so that I can reconcile cost.",
+    "tickets": [
+      "C01",
+      "C07",
+      "C08",
+      "A07",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-099",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want to test a sample journey before publishing the hosted experience, so that I launch confidently.",
+    "tickets": [
+      "C01",
+      "C07",
+      "C08",
+      "A07",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-100",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want a dashboard of qualified sessions, generated looks, saves, product clicks, stylist requests and provider units, each with a defined denominator and time window, so that numbers are interpretable.",
+    "tickets": [
+      "C01",
+      "C07",
+      "C08",
+      "A07",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-101",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want clicks never reported as purchases and no revenue inferred from saves or carts, so that reporting is honest.",
+    "tickets": [
+      "C01",
+      "C07",
+      "C08",
+      "A07",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-102",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want small-cohort analytics suppressed, so that individual shoppers can't be identified.",
+    "tickets": [
+      "C01",
+      "C07",
+      "C08",
+      "A07",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-103",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want sponsored positioning disclosed and separate from organic ranking, so that recommendations remain trustworthy.",
+    "tickets": [
+      "C01",
+      "C07",
+      "C08",
+      "A07",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-104",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want roles unable to grant themselves privileges, so that access control can't be escalated.",
+    "tickets": [
+      "C01",
+      "C07",
+      "C08",
+      "A07",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-105",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want to diagnose sanitized job failures without seeing raw shopper photos, so that support respects privacy.",
+    "tickets": [
+      "C07",
+      "C08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-106",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want photo access for support only under explicit, audited scope, so that exceptions are accountable.",
+    "tickets": [
+      "C07",
+      "C08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-107",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As merchant staff, I want to retry failed jobs only within my permissions and budget limits, so that retries don't bypass cost controls.",
+    "tickets": [
+      "C07",
+      "C08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-108",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want request and job IDs, latency, errors, units and versions logged with no secrets, photos, signed URLs or personal notes, so that operations are observable and safe.",
+    "tickets": [
+      "C07",
+      "C08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-109",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want provider keys to stay server-side behind an adapter, so that credentials never reach the browser.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-110",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want job states (created, queued, submitted, running, succeeded/failed/timed-out) with cancellation recorded as a local state that may not stop provider billing, so that cost accounting is honest.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-111",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want idempotency keys on local submissions and reconciliation before resubmitting after an ambiguous timeout, so that duplicates and double charges are avoided.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-112",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want only known-retryable failures retried with bounded backoff, so that retries don't amplify failures.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-113",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want webhook authenticity verified and unsolicited callbacks never treated as permission to expose results, so that results stay protected.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-114",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want restarted workers to reconcile pending jobs and duplicate completion events unable to duplicate results or charges, so that recovery is safe.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-115",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want caching keyed by tenant, permission, source digest, capability/version, product/effect settings and retention, and never shared across shoppers, so that personal images are never cross-served.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-116",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want lock changes or unrelated accessory swaps not to trigger needless re-analysis, so that I don't pay time or cost for nothing.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-117",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want estimated cost reserved before calls and reconciled against observed provider usage, so that caps are real.",
+    "tickets": [
+      "C03",
+      "C05",
+      "C06",
+      "C07",
+      "C08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-118",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant, I want every catalog, membership, session and job tenant-scoped, and another tenant's identifiers to fail without disclosing its data, so that tenants are isolated.",
+    "tickets": [
+      "C01",
+      "C04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-119",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want private media in private storage with short-lived signed access, so that my images can't be reached by guessing URLs.",
+    "tickets": [
+      "C01",
+      "C04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-120",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want uploaded bytes validated, metadata stripped and server-side URL fetching restricted, so that uploads and imports can't be abused.",
+    "tickets": [
+      "C01",
+      "C04"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-121",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper using a keyboard or screen reader, I want core flows to meet WCAG 2.2 AA with visible focus, labeled uploads and text equivalents for color choices, so that the product is accessible.",
+    "tickets": [
+      "B08",
+      "C02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-122",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper on a phone, I want photo capture to be usable on a phone browser, so that I can take photos where I am.",
+    "tickets": [
+      "B08",
+      "C02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-123",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want clear states for empty catalog, unsupported anchor, no eligible combination, unknown price, stale stock, camera refusal, bad capture, provider quota, timeout, partial success, expired asset, revoked sharing, withdrawn product and conflicting session edits, so that I always know what happened and what to do next.",
+    "tickets": [
+      "B08",
+      "C02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-124",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a stale browser tab's write to produce a conflict I can review rather than overwriting newer data, so that I don't lose work.",
+    "tickets": [
+      "B08",
+      "C02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-125",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As the product team, I want the rule-based fallback/evaluation baseline reproducible with policy/catalog versions and inputs stored; AI generations record their actual output and need not repeat verbatim.",
+    "tickets": [
+      "A08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-126",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As the product team, I want any learned ranker compared against a frozen baseline on participant-separated data with no hard-constraint violations, so that upgrades are justified.",
+    "tickets": [
+      "A08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-127",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As the product team, I want subgroup outcomes (including deep skin tones) reported with participant counts and uncertainty, so that we don't overclaim.",
+    "tickets": [
+      "A08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-128",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want matching jewellery suggested for the clothing I'm building around, so that I can finish the look in one place.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-129",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to see the garment attributes used for matching (neckline, colour, formality), so that I understand the basis.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-130",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to edit those attributes, so that a wrong catalog value or recognition doesn't drive suggestions.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-131",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want attributes recognised from an uploaded owned item treated as suggestions I confirm, so that nothing is assumed.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-132",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to choose metal, style and a jewellery budget, or leave them unspecified, so that I control the result.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-133",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want metal and colour never chosen or narrowed from my skin tone, so that I keep full choice.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-134",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want up to three jewellery sets of exact catalog items with itemized prices, so that I can compare real options.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-135",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a reason for each set tied to real attributes (for example neckline), so that suggestions are explained.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-136",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want fewer sets when fewer qualify, and items missing needed attributes excluded or marked lower-confidence, so that I'm not given weak matches silently.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-137",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want earrings previewed on my photo with \"illustrative preview\" wording, so that I can judge them.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-138",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want necklaces labelled \u201cproduct only\u201d until their preview capability and assets are validated, so that availability is accurate.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-139",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to lock or swap single jewellery items within a set, so that I can iterate precisely.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-140",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want changing the garment to invalidate dependent jewellery suggestions while my locked items are flagged for recheck, so that I don't keep a stale pairing unknowingly.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-141",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want jewellery spend counted toward my budget and owned jewellery counted as zero, so that totals are honest.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-142",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a failed earrings preview or suggestion to leave the rest of my look intact, so that partial success is preserved.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-143",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant, I want pairing and exclusion rules for jewellery, so that suggestions follow my merchandising.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-144",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant, I want sponsored jewellery placements disclosed and separate from organic ranking, so that recommendations stay trustworthy.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-145",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a catalog editor, I want jewellery attributes (type, metal, style, length) and garment matching attributes (neckline, colour, formality) in the catalog, so that matching has real data.",
+    "tickets": [
+      "A05",
+      "A07",
+      "C05",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-146",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to be told on entry that only own-brand and sponsor-brand products are shown, so that I know the scope.",
+    "tickets": [
+      "A01",
+      "A03",
+      "B01"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-147",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want each product labelled with its brand and partner status, so that I can see who it comes from.",
+    "tickets": [
+      "A01",
+      "A03",
+      "B01"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-148",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want recommendations still driven by my preferences, budget and locks, so that partner status doesn't override my choices.",
+    "tickets": [
+      "A01",
+      "A03",
+      "B01"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-149",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to add an item to my wardrobe as saved, so that I can keep it for later.",
+    "tickets": [
+      "C01",
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-150",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want purchased items to show as ordered and then owned on delivery or my confirmation, so that my wardrobe is truthful.",
+    "tickets": [
+      "C01",
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-151",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want previewed items never marked owned, so that previews don't pollute my wardrobe.",
+    "tickets": [
+      "C01",
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-152",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to buy a whole look or only chosen items, with owned items excluded, so that I pay only for what I need.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-153",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to choose required variant options (size where applicable), save an address and a payment method once, so that later purchases are quick.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-154",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want one confirmation screen with itemized merchandise, shipping, tax and total, so that I know the exact cost before paying.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-155",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a single explicit confirm to place the order, so that buying is fast but deliberate.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-156",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want price and stock rechecked at confirm and any change shown for reconfirmation, so that I'm not charged an unexpected amount.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-157",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want mixed availability shown per item before I confirm, so that I can decide what to buy.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-158",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a clear message when stock disappears between confirm and payment, with no silent substitution, so that I stay in control.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-159",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want the payment clearly labelled \"Demo payment\" with simulated outcomes (success, decline, authentication, timeout), so that no one thinks real money moved.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-160",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to never be charged twice if I click again or the network drops, so that I'm protected from duplicates.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-161",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to enter card details only in gateway-hosted fields, so that the product never holds my card number.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-162",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want separate consent to store my address and payment method, with deletion controls, so that I decide what is kept.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-163",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want order confirmation and status updates, and to cancel before shipment, so that I can follow and change my order.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-164",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want my photos never attached to orders, so that my images stay private.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-165",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a stylist, I want to propose items without being able to place an order for a shopper, so that spending stays with the shopper.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-166",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a warehouse operator, I want inventory reserved at checkout with an expiry, so that stock isn't oversold or held forever.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-167",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a warehouse operator, I want orders passed to fulfilment with state updates (allocated, picked, shipped, delivered), so that status is accurate.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-168",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want the payment and warehouse adapters swappable between demo and real implementations, so that going live doesn't rewrite the product.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-169",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a platform operator, I want payment webhooks verified and ambiguous timeouts reconciled before retry, so that order and payment state stay consistent.",
+    "tickets": [
+      "C02",
+      "B06"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-170",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want purchase reporting based on first-party orders, with demo orders flagged and excluded from revenue claims, so that numbers are honest.",
+    "tickets": [
+      "A08",
+      "C08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-171",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want clicks and saves never reported as purchases, so that funnel metrics stay truthful.",
+    "tickets": [
+      "A08",
+      "C08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-172",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want more than one anchor in a look, so that I can build around two pieces at once.",
+    "tickets": [
+      "C02",
+      "A02",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-173",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want conflicts between anchors shown with options to resolve them, so that neither is replaced silently.",
+    "tickets": [
+      "C02",
+      "A02",
+      "B02"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-174",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to upload an inspiration image and choose which visual elements to match (colour, silhouette, accessory style), so that I get catalog candidates in that direction.",
+    "tickets": [
+      "A05",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-175",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want similarity reasons shown for each candidate and no claim of an exact product without evidence, so that I can judge the match.",
+    "tickets": [
+      "A05",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-176",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want a Wear Diary of dates, conditions and subjective outcomes, so that my real experience improves future suggestions.",
+    "tickets": [
+      "C01",
+      "A05",
+      "A08",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-177",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want optional physical-swatch comparison for foundation, with calibration claims shown only if validated, so that I'm never shown unproven precision.",
+    "tickets": [
+      "C01",
+      "A05",
+      "A08",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-178",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want hair colour previews on my photo, so that I can see a colour change before committing.",
+    "tickets": [
+      "C05",
+      "C07",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-179",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want necklace, ring, bracelet and watch previews once validated for the account, and product-only labels until then, so that I always know what is real.",
+    "tickets": [
+      "C05",
+      "C07",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-180",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to opt into one combined full-look image, with automatic fallback to separate previews when earlier edits are not preserved, so that I never see a distorted composite.",
+    "tickets": [
+      "C05",
+      "C07",
+      "B05"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-181",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to export a lookbook (image or PDF) with exact products, price timestamps and \"illustrative preview\" labels, so that I can keep and share a look.",
+    "tickets": [
+      "C02",
+      "C04",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-182",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to group saved looks into collections, so that I can organise them by occasion.",
+    "tickets": [
+      "C02",
+      "C04",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-183",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a shopper, I want to book a live consultation with a stylist where we both see the same session version, so that advice is real time and traceable.",
+    "tickets": [
+      "A06",
+      "C02",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-184",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a stylist, I want changes made during a live consultation to be versioned proposals, so that nothing is silently edited.",
+    "tickets": [
+      "A06",
+      "C02",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-185",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want to sync variants and offers from my commerce platform under explicit conflict rules, so that the catalog stays current without being treated as live stock.",
+    "tickets": [
+      "A07",
+      "C01",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-186",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want to embed the experience as a widget on my pages with the same consent, scope and confirmation rules, so that shoppers meet it where they browse.",
+    "tickets": [
+      "A07",
+      "C01",
+      "B08"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-187",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want plans, invoices and overages reconciled with the usage ledger, so that billing is accurate.",
+    "tickets": [
+      "C02",
+      "C08",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-188",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As a merchant owner, I want purchase attribution from first-party orders, with a controlled comparison before any revenue-effect claim, so that results are credible.",
+    "tickets": [
+      "C02",
+      "C08",
+      "A08",
+      "B07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  },
+  {
+    "id": "US-189",
+    "source": "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md",
+    "requirement": "As the product team, I want a separately trained replacement ranker, physical-swatch calibration and any newly enabled preview category to ship only after meeting predeclared gates on held-out data, so that we don't overclaim.",
+    "tickets": [
+      "A08",
+      "C07"
+    ],
+    "acceptance": "Verify the observable requirement through API/adapter/browser seams, including adverse authorization, freshness and duplicate cases where applicable.",
+    "status": "PLANNED_NOT_IMPLEMENTED"
+  }
+]

@@ -1,0 +1,6 @@
+:root { color-scheme: light; font-family: system-ui, sans-serif; color: #34232e; background: #faf6ee; }
+body { margin: 0; }
+main { max-width: 64rem; margin: 12vh auto; padding: 2rem; }
+h1 { font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.04em; }
+p { line-height: 1.6; }
+[role="status"] { margin-top: 3rem; color: #6b4e5d; }

@@ -1,0 +1,21 @@
+{
+  "docsCommit": "41703627631c53a23afe831935717d0b773d7263",
+  "sourceZipSha256": "ca1c6d1c3477d2d7c91fb1a7521853c3f1ac3763db0a19f1c425fe3f8be4bdfe",
+  "files": {
+    "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-AI-Stylist-Spec.md": "457088b9936eae610b5d3cd9d0cc91098e394f16301a42f5573e072267246965",
+    "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-Audit.md": "d2ad9a807e79ab3fa0158d43f946aa79c6a4cc3d8fbc03842951b8c80f97672f",
+    "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-Behavior-Contract.md": "228d529b50a41a593653e828ebae95d455919678d42c283bd61d5aeeeabe9fc2",
+    "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-Delivery-Checklist.md": "1ce04e0b506cebd127e3e075df8256dfd6e2bc1b9eb766548778501d874a1acd",
+    "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-Links.md": "3b676a3894e12ffc8eab66b6f851cae5166d837fb9d94af74098a057ea9f3d5e",
+    "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-PRD.md": "d03bcdf04f9fab277d14437e946e844561ba0575bdbccaf9955fe9e32ece6eda",
+    "reference/Anchor-Fit-Final-v3.3/Anchor-Fit-YouCam-APIs.md": "da43caa412ada05e2a2de22bf1af25ae1db68a3c9f44cdfca7aa58a9684763b7",
+    "reference/Anchor-Fit-Final-v3.3/README.md": "6dfb266793a9f3a49b196945c1492e88f3025459d6271b414dda4930db9c7f85",
+    "reference/Anchor-Fit-Final-v3.3/Validation-Results.md": "416e33539837c6e82c7335209a0cf265c9e3119e0a6ed84e317b3e01319ee654",
+    "reference/Anchor-Fit-Final-v3.3/anchor-fit-spec.md": "678dc2e44d49847df5e9c5da77be27b1645809324ca5ef68c09b8ca62925bd90",
+    "reference/Anchor-Fit-Final-v3.3/asset-manifest-template.csv": "9bc1691875470915fe4f1f52ce80f46704fb262a0c6fd2e1c975a875c8202e74",
+    "reference/Anchor-Fit-Final-v3.3/demo-catalog.json": "4342e56526ba9293b623b52b082d003d28db266e1db4eb648778010574ad7a38",
+    "reference/Anchor-Fit-Final-v3.3/stylist-contract-fixtures.json": "afc39373ff200fc305008dafc5289006468f0c66848e16d6b0507c482c8e168e",
+    "reference/Anchor-Fit-Final-v3.3/stylist-output.schema.json": "0d01e68d778898848985a42ce871a39f93130806eb562e94da60e1e87d24dc9b",
+    "reference/Anchor-Fit-Final-v3.3/stylist-request.schema.json": "1dbf84285dfde2f71d8d9a6d081e300f4746ace4ada800b80e65b47e5f67b1db"
+  }
+}

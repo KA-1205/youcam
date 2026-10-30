@@ -1,0 +1,8 @@
+# GitHub accounts for individual lane owners have not been supplied.
+# Path enforcement is handled by CI; the repository owner reviews all changes.
+* @KA-1205
+/reference/ @KA-1205
+/contracts/ @KA-1205
+/policy/ @KA-1205
+/.github/ @KA-1205
+/AGENTS.md @KA-1205

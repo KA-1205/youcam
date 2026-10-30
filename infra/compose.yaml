@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: anchor
+      POSTGRES_PASSWORD: local-only
+      POSTGRES_DB: anchor_fit
+    ports: ["127.0.0.1:5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anchor -d anchor_fit"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  storage:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: local-anchor
+      MINIO_ROOT_PASSWORD: local-only-storage
+    ports: ["127.0.0.1:9000:9000"]
+  api:
+    build:
+      context: ..
+      dockerfile: infra/backend.Dockerfile
+    environment:
+      APP_MODE: FOUNDATION
+      LIVE_PROVIDERS_ENABLED: "false"
+      DATABASE_URL: postgresql+psycopg://anchor:local-only@postgres:5432/anchor_fit
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      postgres: {condition: service_healthy}
+  worker:
+    build:
+      context: ..
+      dockerfile: infra/backend.Dockerfile
+    command: [".venv/bin/python", "-m", "apps.worker.main", "--check"]
+    restart: "no"
+  web:
+    build:
+      context: ..
+      dockerfile: infra/web.Dockerfile
+    ports: ["127.0.0.1:3000:3000"]
