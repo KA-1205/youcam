@@ -1,3 +1,4 @@
+import "./helpers/jsx-globals";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createElement } from "react";
