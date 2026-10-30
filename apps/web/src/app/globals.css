@@ -108,10 +108,10 @@ p { line-height: 1.6; }
   transition: border-color 120ms ease;
 }
 .flow-card:hover { border-color: var(--rose); }
-.flow-card a { display: block; padding: 1.1rem 1.2rem; color: inherit; text-decoration: none; }
+.flow-card a, a.flow-card { display: block; padding: 1.1rem 1.2rem; color: inherit; text-decoration: none; }
 .flow-card h2 { margin: 0 0 0.4rem; font-size: 1.05rem; }
 .flow-card p { margin: 0; color: var(--plum-soft); font-size: 0.92rem; }
-.flow-card a:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; border-radius: 0.75rem; }
+.flow-card a:focus-visible, a.flow-card:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; border-radius: 0.75rem; }
 
 /* Shared controls */
 .button {
@@ -179,3 +179,25 @@ p { line-height: 1.6; }
 }
 
 .loading-note { color: var(--plum-soft); font-style: italic; }
+
+/* Studio layout */
+.studio-layout { display: grid; grid-template-columns: 18rem 1fr; gap: 1.25rem; align-items: start; }
+@media (max-width: 50rem) { .studio-layout { grid-template-columns: 1fr; } }
+.studio-side { display: grid; gap: 1rem; }
+.studio-looks { display: grid; gap: 1rem; }
+.look-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: 1rem; }
+.look-card--selected { border-color: var(--rose); box-shadow: 0 0 0 1px var(--rose); }
+.look-card header { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+.look-card h3 { margin: 0; }
+.item-list { list-style: none; margin: 0.75rem 0; padding: 0; display: grid; gap: 0.6rem; }
+.item-list li { border-top: 1px dashed var(--line); padding-top: 0.6rem; }
+.item-row { display: flex; justify-content: space-between; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.item-actions { display: inline-flex; gap: 0.35rem; }
+.item-actions .button { padding: 0.2rem 0.7rem; font-size: 0.8rem; }
+.subtotal { margin: 0.4rem 0; }
+.look-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.6rem; }
+.muted { color: var(--plum-soft); }
+.slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: 0.4rem; }
+.slot-choice { text-transform: capitalize; }
+fieldset { border: 1px solid var(--line); border-radius: 0.6rem; margin: 0 0 1rem; }
+legend { font-weight: 600; padding: 0 0.4rem; }

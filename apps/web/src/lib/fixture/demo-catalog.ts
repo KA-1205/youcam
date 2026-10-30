@@ -54,7 +54,7 @@ export const VARIANTS: CatalogVariant[] = [
     priceMinor: 70000, currency: "INR", stock: 10,
     published: true, options: {"size": "M"}, attributes: {},
     imageId: null, previewStatus: "UNVERIFIED_ASSET", isSynthetic: true,
-    checkedAt: "2026-10-29T23:59:59Z", expiresAt: "2026-10-30T00:15:00Z", sourceVersion: "demo-fixture-1",
+    checkedAt: "2026-10-29T23:30:00Z", expiresAt: "2026-10-29T23:45:00Z", sourceVersion: "demo-fixture-1",
   },
   {
     tenantId: "demo-anchor-fit", productId: "product-top-6", variantId: "variant-top-6",
