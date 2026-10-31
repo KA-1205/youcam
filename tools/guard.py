@@ -44,29 +44,61 @@ def path_errors(paths: list[str], branch: str, ownership: dict) -> list[str]:
     return errors
 
 
+ATTRIBUTION = re.compile(
+    r'(?i)co-authored|generated.by|\b(ai|codex|claude|chatgpt|copilot)\b'
+    r'|\b[A-Z][A-Z0-9]*-\d+\b|\b[ABC]\d{2}\b'
+)
+
+SQUASH_ENVELOPE = re.compile(
+    r'(?s)(?P<title>[^\n]{1,100}?)(?: \(#(?P<number>[1-9][0-9]*)\))?\n\n(?P<body>.+)'
+)
+
+
 def message_errors(message: str) -> list[str]:
     text = message.rstrip('\n')
     if '\n' in text or not 1 <= len(text) <= 50:
         return ['Commit must have only a subject of 1–50 characters']
     if not 2 <= len(text.split()) <= 6:
         return ['Commit subject must contain 2–6 words']
-    if re.search(r'(?i)co-authored|generated.by|\b(ai|codex|claude|chatgpt|copilot)\b|\b[A-Z][A-Z0-9]*-\d+\b|\b[ABC]\d{2}\b', text):
+    if ATTRIBUTION.search(text):
         return ['Commit subject contains attribution or ticket tags']
     if any(ord(c) > 127 for c in text):
         return ['Use plain subject text without emoji']
     return []
 
 
+def squash_envelope_errors(message: str) -> list[str]:
+    """Validate GitHub squash-merge envelopes: title (#N) plus bullet subjects."""
+    match = SQUASH_ENVELOPE.fullmatch(message.rstrip('\n'))
+    if not match:
+        return ['Commit is not a recognized GitHub squash merge envelope']
+    title = match.group('title')
+    if ATTRIBUTION.search(title) or any(ord(c) > 127 for c in title):
+        return ['Squash merge subject contains attribution or emoji']
+    errors = []
+    for line in match.group('body').split('\n'):
+        if not line:
+            continue
+        if not line.startswith('* '):
+            errors.append(f'Squash merge body must contain only bullet subjects: {line}')
+            continue
+        errors += message_errors(line[2:])
+    return errors
+
+
 def commit_message_errors(message: str, branch: str, parent_count: int) -> list[str]:
     """Permit only genuine GitHub PR merge envelopes on main."""
-    if branch == 'main' and parent_count == 2:
-        match = re.fullmatch(
-            r'Merge pull request #[1-9][0-9]* from [A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+'
-            r'\n\n([^\n]{1,100})\n*',
-            message,
-        )
-        if match and not re.search(r'(?i)co-authored|generated.by', match.group(1)):
-            return []
+    if branch == 'main':
+        if parent_count == 2:
+            match = re.fullmatch(
+                r'Merge pull request #[1-9][0-9]* from [A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+'
+                r'\n\n([^\n]{1,100})\n*',
+                message,
+            )
+            if match and not re.search(r'(?i)co-authored|generated.by', match.group(1)):
+                return []
+        elif parent_count == 1 and '\n' in message.rstrip('\n'):
+            return squash_envelope_errors(message)
     return message_errors(message)
 
 
