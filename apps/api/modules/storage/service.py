@@ -106,6 +106,25 @@ class StorageService:
         db.flush()
         return Ack(requestId=uuid4(), status='ACCEPTED')
 
+    def revoke_for_actors(self, db: Session, actor_ids: list[str]) -> int:
+        """Account deletion: revoke access immediately and drop stored bytes now."""
+        if not actor_ids:
+            return 0
+        now = clock.now()
+        revoked = 0
+        for row in db.scalars(select(AssetRow)
+                              .where(AssetRow.actor_id.in_(actor_ids),
+                                     AssetRow.status.in_(('PENDING_UPLOAD', 'AVAILABLE')))).all():
+            self._backend.delete(row.storage_key)
+            row.status = 'REVOKED'
+            row.deleted_at = now
+            row.updated_at = now
+            self._audit(db, row.asset_id, row.actor_id, 'REVOKED',
+                        {'reason': 'ACCOUNT_DELETED', 'mode': self._backend.mode})
+            revoked += 1
+        db.flush()
+        return revoked
+
     def store_render_result(self, db: Session, tenant_id: str, actor_id: str,
                             capability: str, data: bytes = b'fixture-render-bytes') -> str:
         """Persist a provider result into private storage as a fresh unsaved asset.

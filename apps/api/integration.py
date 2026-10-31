@@ -179,6 +179,19 @@ class ShareRegistry:
                    and not record['revoked'] and record['expiresAt'] > now
                    for record in self._shares.values())
 
+    def revoke_all_for(self, account_id: str, session_ids: list[UUID]) -> int:
+        """Account deletion: shares granted to the account and shares of its
+        sessions lose access immediately."""
+        revoked = 0
+        for record in self._shares.values():
+            if record['revoked']:
+                continue
+            if record['recipientAccountId'] == account_id \
+                    or record['sessionId'] in session_ids:
+                record['revoked'] = True
+                revoked += 1
+        return revoked
+
 
 def require_consent_revision(session: m.SessionSnapshot, expected: int) -> None:
     if expected != session.consentRevision:

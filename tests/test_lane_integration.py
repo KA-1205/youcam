@@ -347,12 +347,11 @@ def test_staging_and_publication_flow(client):
     assert updated['priceMinor'] == 52000
 
 
-# -- honest foundation gaps ----------------------------------------------------
+# -- full frozen surface served -------------------------------------------------
 
-def test_unimplemented_c_surface_stays_labelled(client):
+def test_every_frozen_route_is_served(client):
     login(client)
     insights = client.get('/api/merchant/insights')
-    assert insights.status_code == 501
-    assert insights.json()['error']['code'] == 'NOT_IMPLEMENTED'
+    assert insights.status_code in (200, 403)  # shopper lacks the merchant scope
     deleted = client.delete('/api/account')
-    assert deleted.status_code == 501
+    assert deleted.status_code in (202, 403)  # guest lacks the verified scope

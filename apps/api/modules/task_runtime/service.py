@@ -127,5 +127,20 @@ class TaskService:
         row = db.get(DurableTaskRow, str(task_id))
         return to_dto(row) if row is not None else None
 
+    def cancel_for_actors(self, db: Session, actor_ids: list[str], now: datetime) -> int:
+        """Stop queued or leased work for deleted accounts; the claim loop skips these."""
+        if not actor_ids:
+            return 0
+        rows = db.scalars(select(DurableTaskRow)
+                          .where(DurableTaskRow.actor_id.in_(actor_ids),
+                                 DurableTaskRow.status.in_(('PENDING', 'WAITING', 'LEASED')))).all()
+        for row in rows:
+            row.status = 'CANCELLED'
+            row.lease_worker_id = None
+            row.lease_expires_at = None
+            row.updated_at = now
+        db.flush()
+        return len(rows)
+
 
 __all__ = ['TaskBase', 'TaskService', 'LEASE_TTL', 'RETRY_BACKOFF']

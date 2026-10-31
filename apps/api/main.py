@@ -15,6 +15,7 @@ from fastapi import Depends, FastAPI, Header, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.exceptions import HTTPException
 
@@ -32,12 +33,17 @@ from apps.api.integration import (
     lane_api_error,
     require_consent_revision,
 )
+from apps.api.modules.commerce.models import OrderRow
 from apps.api.modules.commerce.ports import DemoPaymentPort
 from apps.api.modules.commerce.service import CommerceService, replay, store
+from apps.api.modules.merchant_insights.service import InsightsService
+from apps.api.modules.shopper_profile.models import WardrobeItem
 from apps.api.modules.shopper_profile.service import ProfileService
 from apps.api.modules.storage.backend import create_backend
 from apps.api.modules.storage.service import StorageService
+from apps.api.modules.styling_session.models import StylingSessionRow
 from apps.api.modules.styling_session.service import SessionService
+from apps.api.modules.task_runtime.models import DurableTaskRow
 from apps.api.modules.task_runtime.service import TaskService
 from apps.api.modules.tenant_access.models import Account as AccessAccount
 from apps.api.modules.tenant_access.models import Actor
@@ -94,6 +100,9 @@ def create_app(database_url: str | None = None) -> FastAPI:
     shares = ShareRegistry(actor_account)
     proposals = ProposalService(shared=shares)
     proposal_sessions: dict[UUID, UUID] = {}
+    # In-process demo evidence for the insights dashboard (mode DEMO, single process).
+    stylist_ledger: list[dict[str, Any]] = []
+    insights_service = InsightsService()
 
     def ctx_of(db: Session, identity: Identity) -> m.AccessContext:
         revision = profile_service.latest_revision(db, identity.actor_id)
@@ -342,6 +351,11 @@ def create_app(database_url: str | None = None) -> FastAPI:
             # Fixture mode runs the queued job inline; live deployments drive it
             # from the durable worker instead.
             broker.run(accepted.jobId, now=clock.now())
+            job = broker.get(accepted.jobId, ctx)
+            stylist_ledger.append({
+                'at': clock.now(), 'actorId': ctx.actorId,
+                'looks': len(job.result.looks)
+                if isinstance(job.result, m.LooksResult) else 0})
         return m.JobAccepted(jobId=accepted.jobId,
                              statusUrl=f'/api/stylist-jobs/{accepted.jobId}',
                              status='QUEUED', sessionVersion=body.expectedSessionVersion)
@@ -485,6 +499,58 @@ def create_app(database_url: str | None = None) -> FastAPI:
         require_role(ctx, 'MERCHANT_ADMIN', 'PLATFORM_OPERATOR')
         return catalog.publish(ctx, stageId, body)
 
+    def get_insights(cursor: str | None = Query(default=None),
+                     limit: int = Query(default=100, ge=1, le=100),
+                     identity: Identity = Depends(get_identity),
+                     db: Session = Depends(get_db)) -> m.Insights:
+        ctx = ctx_of(db, identity)
+        require_role(ctx, 'MERCHANT_ADMIN', 'PLATFORM_OPERATOR')
+
+        def counts(start, end):
+            def windowed(rows, at_index, actor_index):
+                current = [(clock.as_utc(row[at_index]), row[actor_index]) for row in rows]
+                inside = [(at, actor) for at, actor in current if start <= at <= end]
+                return (len(inside), len({actor for _, actor in inside}))
+
+            sessions = db.execute(select(StylingSessionRow.created_at,
+                                         StylingSessionRow.owner_actor_id)).all()
+            saves = db.execute(select(WardrobeItem.updated_at, WardrobeItem.account_id)
+                               .where(WardrobeItem.saved.is_(True))).all()
+            orders = db.execute(select(OrderRow.created_at, OrderRow.account_id)).all()
+            previews = db.execute(select(DurableTaskRow.created_at, DurableTaskRow.actor_id)
+                                  .where(DurableTaskRow.operation == 'PREVIEW')).all()
+            requests = [entry for entry in stylist_ledger if start <= clock.as_utc(entry['at']) <= end]
+            looks = sum(entry['looks'] for entry in requests)
+            look_actors = {entry['actorId'] for entry in requests if entry['looks']}
+            return {
+                'qualifiedSessions': windowed(sessions, 0, 1),
+                'wardrobeSaves': windowed(saves, 0, 1),
+                'orders': windowed(orders, 0, 1),
+                'previewJobs': windowed(previews, 0, 1),
+                'stylistRequests': (len(requests), len({entry['actorId'] for entry in requests})),
+                'generatedLooks': (looks, len(look_actors)),
+            }
+
+        return insights_service.page(counts)
+
+    def delete_account(identity: Identity = Depends(get_identity),
+                       db: Session = Depends(get_db)) -> m.Ack:
+        if not identity.verified or identity.account_id is None:
+            raise ApiError(403, SCOPE_FORBIDDEN,
+                           'Account deletion requires a verified account.')
+        try:
+            actor_ids = access_service.delete_account(db, identity.account_id)
+        except LookupError:
+            raise ApiError(404, 'NOT_FOUND', 'Unknown or non-owned resource.') from None
+        now = clock.now()
+        task_service.cancel_for_actors(db, actor_ids, now)
+        storage_service.revoke_for_actors(db, actor_ids)
+        session_ids = [UUID(row) for row in db.scalars(select(StylingSessionRow.session_id)
+                                                       .where(StylingSessionRow.owner_actor_id
+                                                              .in_(actor_ids)))]
+        shares.revoke_all_for(identity.account_id, session_ids)
+        return m.Ack(requestId=uuid4(), status='ACCEPTED')
+
     HANDLERS: dict[str, Any] = {
         'getProfile': get_profile,
         'updateConsent': update_consent,
@@ -502,6 +568,8 @@ def create_app(database_url: str | None = None) -> FastAPI:
         'getVariant': get_catalog_variant,
         'stageCatalog': stage_catalog,
         'publishCatalog': publish_catalog,
+        'getInsights': get_insights,
+        'deleteAccount': delete_account,
         'createShare': create_share,
         'revokeShare': revoke_share,
         'createProposal': create_proposal,
