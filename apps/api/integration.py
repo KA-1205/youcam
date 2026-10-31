@@ -6,6 +6,7 @@ lane A's rule-based engine because no AI model is configured in this
 deployment, and share state is in-process per the seven-day share contract.
 """
 import json
+import os
 from datetime import timedelta
 from pathlib import Path
 from typing import Any, Callable
@@ -130,7 +131,13 @@ class RecommendationFallback:
 
 
 def build_broker() -> StylistBroker:
-    return StylistBroker(adapter=UnavailableModelAdapter(), fallback=RecommendationFallback())
+    from services.stylist.gemini import GeminiAdapter
+
+    key = os.getenv('STYLIST_API_KEY')
+    adapter = (GeminiAdapter(key, os.getenv('STYLIST_MODEL', 'gemini-3.8-flash'))
+               if key and os.getenv('STYLIST_PROVIDER', 'gemini') == 'gemini'
+               else UnavailableModelAdapter())
+    return StylistBroker(adapter=adapter, fallback=RecommendationFallback())
 
 
 class ShareRegistry:
