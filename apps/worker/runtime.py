@@ -10,8 +10,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from apps.api.db import Database
-from apps.api.demo_catalog import FixtureCatalog
 from apps.api.errors import ApiError
+from apps.api.integration import IntegratedCatalog
 from apps.api.modules.commerce.models import OrderRow, OutboxEventRow
 from apps.api.modules.commerce.ports import DemoPaymentPort
 from apps.api.modules.commerce.service import CommerceService
@@ -32,7 +32,7 @@ OUTBOX_TTL_MARK = 'PUBLISHED'
 @dataclass
 class Runtime:
     database: Database
-    catalog: FixtureCatalog
+    catalog: IntegratedCatalog
     access: AccessService
     profile: ProfileService
     sessions: SessionService
@@ -151,7 +151,7 @@ class Runtime:
 
 
 def build_runtime(database: Database, client_factory=None) -> Runtime:
-    catalog = FixtureCatalog()
+    catalog = IntegratedCatalog()
     profile = ProfileService(resolve_slot=catalog.slot_for)
     sessions = SessionService(catalog)
     tasks = TaskService()

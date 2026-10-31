@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-from tools.coverage_audit import TICKET_PATHS, audit, load_traceability
+from tools.coverage_audit import TICKET_PATHS, audit
 
 MANIFEST = json.loads(Path('policy/traceability.json').read_text(encoding='utf-8'))
 

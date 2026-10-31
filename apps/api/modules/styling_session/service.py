@@ -54,6 +54,17 @@ class SessionService:
     def snapshot(self, db: Session, ctx: AccessContext, session_id: UUID) -> SessionSnapshot:
         return _snapshot(self._owned_row(db, ctx, session_id), ctx)
 
+    def read_shared(self, db: Session, ctx: AccessContext, session_id: UUID) -> SessionSnapshot:
+        """Tenant-checked read for explicitly shared sessions.
+
+        The composition root gates this behind the share registry before the
+        call; ownership is intentionally not required here.
+        """
+        row = db.get(StylingSessionRow, str(session_id))
+        if row is None or row.tenant_id != ctx.tenantId:
+            raise ApiError(404, 'NOT_FOUND', 'Unknown session.')
+        return _snapshot(row, ctx)
+
     def edit(self, db: Session, ctx: AccessContext, session_id: UUID, body: SessionEdit,
              approved_brief: Brief | None = None) -> SessionSnapshot:
         row = self._owned_row(db, ctx, session_id)
