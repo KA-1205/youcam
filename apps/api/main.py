@@ -6,7 +6,6 @@ operations activate per ticket. Frozen contracts in contracts.runtime are never
 modified here.
 """
 import os
-from collections.abc import Iterator
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
@@ -111,9 +110,8 @@ def create_app(database_url: str | None = None) -> FastAPI:
                   description='C-owned HTTP delivery; live providers stay disabled until '
                               'verified activation.')
 
-    def get_db() -> Iterator[Session]:
-        with database.unit_of_work() as session:
-            yield session
+    def get_db(request: Request) -> Session:
+        return request.state.db
 
     def get_identity(request: Request, response: Response,
                      db: Session = Depends(get_db)) -> Identity:
@@ -599,6 +597,30 @@ def create_app(database_url: str | None = None) -> FastAPI:
     async def security_headers(request: Request, call_next):
         response = await call_next(request)
         response.headers.update(SECURITY_HEADERS)
+        return response
+
+    @app.middleware('http')
+    async def commit_before_transmission(request: Request, call_next):
+        """Own the unit of work outside the routing stack.
+
+        Yield-dependency teardown runs after the response is transmitted, so a
+        commit there acknowledges writes before they are durable. Committing in
+        middleware (5xx and failures roll back) keeps every acknowledged write
+        committed before the response starts.
+        """
+        session = database.sessions()
+        request.state.db = session
+        try:
+            response = await call_next(request)
+        except Exception:
+            session.rollback()
+            session.close()
+            raise
+        if response.status_code < 500:
+            session.commit()
+        else:
+            session.rollback()
+        session.close()
         return response
 
     @app.middleware('http')

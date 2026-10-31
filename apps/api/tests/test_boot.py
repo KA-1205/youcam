@@ -20,4 +20,4 @@ def test_boot_health_and_unimplemented_route(tmp_path, monkeypatch):
         assert response.json()['items']
         assert client.get('/api/catalog/variants?limit=101').status_code == 422
         assert client.get('/unknown').json()['error']['code'] == 'NOT_FOUND'
-        assert client.delete('/api/account').json()['error']['code'] == 'NOT_IMPLEMENTED'
+        assert client.delete('/api/account').json()['error']['code'] == 'SCOPE_FORBIDDEN'
