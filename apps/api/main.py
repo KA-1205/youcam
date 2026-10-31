@@ -12,6 +12,7 @@ from uuid import UUID, uuid4
 import sqlalchemy
 from fastapi import Depends, FastAPI, Header, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
@@ -110,6 +111,14 @@ def create_app(database_url: str | None = None) -> FastAPI:
                   description='C-owned HTTP delivery; live providers stay disabled until '
                               'verified activation.')
 
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=os.getenv('CORS_ORIGINS',
+            'http://127.0.0.1:3000,http://localhost:3000').split(','),
+        allow_credentials=True, allow_methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allow_headers=['Content-Type', 'Idempotency-Key'],
+    )
+
     def get_db(request: Request) -> Session:
         return request.state.db
 
@@ -118,7 +127,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
         identity = access_service.resolve(db, request.cookies.get(COOKIE_NAME))
         if identity.set_cookie:
             response.set_cookie(COOKIE_NAME, identity.set_cookie, max_age=86400, path='/',
-                                httponly=True, secure=True, samesite='lax')
+                                httponly=True, secure=request.url.scheme == 'https' or not demo_mode_enabled(), samesite='lax')
         profile_service.ensure_actor_consent(db, identity.actor_id)
         return identity
 
@@ -165,7 +174,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
                                              roles=(body.role,))
         if identity.set_cookie:
             response.set_cookie(COOKIE_NAME, identity.set_cookie, max_age=86400, path='/',
-                                httponly=True, secure=True, samesite='lax')
+                                httponly=True, secure=request.url.scheme == 'https' or not demo_mode_enabled(), samesite='lax')
         return {'accountId': identity.account_id, 'verified': identity.verified,
                 'mode': 'DEMO', 'roles': identity.roles}
 
@@ -268,6 +277,27 @@ def create_app(database_url: str | None = None) -> FastAPI:
                              db: Session = Depends(get_db)) -> m.AssetDescriptor:
         return _idempotent(db, identity, 'prepareAssetUpload', idempotency_key, body,
                            lambda: storage_service.prepare_upload(db, ctx_of(db, identity), body))
+
+    @app.put('/api/assets/{assetId}/content', include_in_schema=False)
+    async def upload_content(assetId: UUID, request: Request,
+                             identity: Identity = Depends(get_identity),
+                             db: Session = Depends(get_db)) -> m.AssetDescriptor:
+        from apps.api.modules.storage.service import MAX_BYTES
+
+        data = bytearray()
+        async for chunk in request.stream():
+            data.extend(chunk)
+            if len(data) > MAX_BYTES:
+                raise ApiError(413, 'VALIDATION_ERROR', 'Photo exceeds the supported size.')
+        return storage_service.upload_content(db, ctx_of(db, identity), str(assetId),
+                                              bytes(data), request.headers.get('content-type', ''))
+
+    @app.get('/api/assets/{assetId}/content', include_in_schema=False)
+    def asset_content(assetId: UUID, identity: Identity = Depends(get_identity),
+                      db: Session = Depends(get_db)) -> Response:
+        data, content_type = storage_service.read_content(db, ctx_of(db, identity), str(assetId))
+        return Response(data, media_type=content_type,
+                        headers={'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff'})
 
     def get_asset(assetId: UUID, identity: Identity = Depends(get_identity),
                   db: Session = Depends(get_db)) -> m.AssetDescriptor:
@@ -646,7 +676,9 @@ def create_app(database_url: str | None = None) -> FastAPI:
         connected = True
         try:
             with database.unit_of_work() as db:
-                db.execute(sqlalchemy.text('SELECT 1'))
+                revision = db.execute(sqlalchemy.text(
+                    'SELECT version_num FROM alembic_version')).scalar_one()
+                connected = revision == '0008_provider_activations'
         except Exception:
             connected = False
         return {'ready': connected, 'database': connected, 'liveProvidersEnabled': False}

@@ -3,5 +3,7 @@
 **/.next
 .venv
 .env*
-reference
 **/__pycache__
+
+.anchor-storage
+*.db

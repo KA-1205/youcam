@@ -85,6 +85,23 @@ function notImplemented<T>(message: string): FixtureResult<T> {
 
 export class LiveTransport {
   private client: ApiClient;
+
+  async demoSignIn(): Promise<void> {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000"}/api/auth/demo-login`, {
+      method: "POST", credentials: "include", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: `local-${crypto.randomUUID()}@demo.invalid` }),
+    });
+    if (!response.ok) throw new Error("Demo login is unavailable on this server.");
+  }
+
+  async uploadFile(assetId: string, file: File): Promise<FixtureResult<AssetDescriptor>> {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000"}/api/assets/${assetId}/content`, {
+      method: "PUT", credentials: "include", headers: { "Content-Type": file.type }, body: file,
+    });
+    const payload = await response.json();
+    return response.ok ? { data: payload } : { error: payload };
+  }
+
   private claimedSessions = new Set<string>();
   private shares = new Map<string, ShareSnapshot>();
   private orders = new Map<string, OrderSnapshot>();
@@ -229,12 +246,10 @@ export class LiveTransport {
   }
 
   async confirmCheckout(_body: CheckoutConfirm, _scripted: DemoOutcome): Promise<FixtureResult<OrderSnapshot>> {
-    // The scripted outcome is a fixture-only affordance; the server's labelled
-    // demo payment port decides the outcome for real calls.
     void _scripted;
-    return notImplemented(
-      "Checkout requires a verified session on the server; use the fixture transport for scripted demo checkouts.",
-    );
+    return toResult(await this.client.POST("/api/orders", {
+      body: _body, params: { header: idempotencyHeaders() },
+    }));
   }
 
   async getOrder(orderId: string): Promise<FixtureResult<OrderSnapshot>> {

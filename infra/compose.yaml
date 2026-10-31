@@ -23,9 +23,11 @@ services:
       context: ..
       dockerfile: infra/backend.Dockerfile
     environment:
-      APP_MODE: FOUNDATION
+      APP_MODE: LOCAL
+      DEMO_MODE: "true"
       LIVE_PROVIDERS_ENABLED: "false"
       DATABASE_URL: postgresql+psycopg://anchor:local-only@postgres:5432/anchor_fit
+    command: ["sh", "-c", ".venv/bin/alembic -c infra/migrations/alembic.ini upgrade head && exec .venv/bin/uvicorn apps.api.main:app --host 0.0.0.0 --port 8000"]
     ports: ["127.0.0.1:8000:8000"]
     depends_on:
       postgres: {condition: service_healthy}
@@ -33,8 +35,13 @@ services:
     build:
       context: ..
       dockerfile: infra/backend.Dockerfile
-    command: [".venv/bin/python", "-m", "apps.worker.main", "--check"]
-    restart: "no"
+    environment:
+      DATABASE_URL: postgresql+psycopg://anchor:local-only@postgres:5432/anchor_fit
+      DEMO_MODE: "true"
+    command: ["sh", "-c", ".venv/bin/alembic -c infra/migrations/alembic.ini upgrade head && exec .venv/bin/python -m apps.worker.main --loop"]
+    depends_on:
+      postgres: {condition: service_healthy}
+    restart: unless-stopped
   web:
     build:
       context: ..

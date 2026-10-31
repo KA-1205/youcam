@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useReducer, useState } from "react";
+import { LiveTransport } from "../../lib/live/transport";
 import { PhotoCapture } from "../../components/photo-capture";
 import { VARIANTS, findVariant } from "../../lib/fixture/demo-catalog";
 import { formatStamp } from "../../lib/format";
@@ -31,6 +32,7 @@ export default function PreviewPage() {
   const [preview, dispatch] = useReducer(previewReducer, INITIAL_PREVIEW);
   const [capabilities, setCapabilities] = useState<CapabilityState[]>([]);
   const [consented, setConsented] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
   const [adult, setAdult] = useState(false);
 
   useEffect(() => {
@@ -49,22 +51,26 @@ export default function PreviewPage() {
 
   async function onUpload() {
     if (!snapshot) return;
+    if (!file) { dispatch({ type: "ERROR", message: "Choose a photo first." }); return; }
     dispatch({ type: "BUSY", busy: true });
     const prepared = await sharedTransport().prepareAssetUpload(
       {
-        capability: "CLOTHES_V4",
-        contentType: "image/jpeg",
-        byteLength: 2048,
+        capability: preview.capability as components["schemas"]["AssetUploadRequest"]["capability"],
+        contentType: file.type as "image/jpeg" | "image/png" | "image/webp",
+        byteLength: file.size,
         adultAttestation: true,
-        expectedConsentRevision: snapshot.consentRevision,
+        expectedConsentRevision: preview.consentRevision ?? snapshot.consentRevision,
       },
-      snapshot.consentRevision,
+      preview.consentRevision ?? snapshot.consentRevision,
     );
     if (prepared.error || !prepared.data) {
       dispatch({ type: "ERROR", message: prepared.error?.error.message ?? "Upload failed." });
       return;
     }
-    const available = await sharedTransport().markUploaded(prepared.data.assetId);
+    const transport = sharedTransport();
+    const available = transport instanceof LiveTransport
+      ? await transport.uploadFile(prepared.data.assetId, file)
+      : await transport.markUploaded(prepared.data.assetId);
     if (available.error || !available.data) {
       dispatch({ type: "ERROR", message: available.error?.error.message ?? "Upload failed." });
       return;
@@ -97,7 +103,7 @@ export default function PreviewPage() {
     const created = await sharedTransport().createPreviewJob({
       capability: preview.capability as components["schemas"]["PreviewRequest"]["capability"],
       effectIds: [],
-      expectedConsentRevision: snapshot.consentRevision,
+      expectedConsentRevision: preview.consentRevision ?? snapshot.consentRevision,
       expectedSessionVersion: snapshot.sessionVersion,
       selections: selectionsToRefs(),
       sessionId: snapshot.sessionId,
@@ -166,7 +172,7 @@ export default function PreviewPage() {
 
       <div className="studio-layout">
         <aside className="studio-side">
-          <PhotoCapture capability={preview.capability} />
+          <PhotoCapture capability={preview.capability} onFile={setFile} />
           <section className="card" aria-label="Upload and consent">
             <h2>Upload</h2>
             <div className="field">
@@ -197,7 +203,7 @@ export default function PreviewPage() {
                           savePhotosAndRenders: false,
                           shareWithStylist: false,
                         },
-                        expectedConsentRevision: snapshot.consentRevision,
+                        expectedConsentRevision: preview.consentRevision ?? snapshot.consentRevision,
                         processors: ["anchor-fit-fixture"],
                       });
                       if (updated.data) dispatch({ type: "CONSENT", revision: updated.data.consentRevision });

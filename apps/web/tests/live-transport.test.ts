@@ -175,3 +175,15 @@ test("transport selection defaults to fixture and honours the live flag", () => 
   assert.equal(transportMode(), "FIXTURE");
   void freshTransport;
 });
+
+test("live checkout reaches the server instead of returning a stub", async () => {
+  const { client, calls } = fakeClient({
+    "POST /api/orders": () => ({ status: 422, payload: {
+      error: { code: "VALIDATION_ERROR", message: "Invalid quote" }, requestId: "r1",
+    } }),
+  });
+  const transport = new LiveTransport(client);
+  const result = await transport.confirmCheckout({} as components["schemas"]["CheckoutConfirm"], "SUCCESS");
+  assert.equal(result.error?.error.code, "VALIDATION_ERROR");
+  assert.equal(calls[0].method, "POST");
+});
