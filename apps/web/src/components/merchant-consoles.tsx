@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { VARIANTS } from "../lib/fixture/demo-catalog";
 import { formatStamp } from "../lib/format";
-import { sharedTransport } from "../lib/fixture/transport";
+import { sharedTransport } from "../lib/transport";
 import type { components } from "../../../../contracts/runtime/client";
 
 type CapabilityState = components["schemas"]["CapabilityState"];
@@ -25,13 +25,17 @@ export function MerchantConsoles({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setCapabilities(sharedTransport().listCapabilities().data?.items ?? []);
-    setMetrics(sharedTransport().getInsights().data?.metrics ?? []);
+    void (async () => {
+      const capabilities = await sharedTransport().listCapabilities();
+      setCapabilities(capabilities.data?.items ?? []);
+      const insights = await sharedTransport().getInsights();
+      setMetrics(insights.data?.metrics ?? []);
+    })();
   }, []);
 
-  function onStage() {
+  async function onStage() {
     setError(null);
-    const result = sharedTransport().stageCatalog({
+    const result = await sharedTransport().stageCatalog({
       sourceId: "demo-source",
       sourceVersion: "2026-10-30T00:00:00Z",
       variants: [...structuredClone(VARIANTS), structuredClone(VARIANTS[0])],
@@ -40,10 +44,10 @@ export function MerchantConsoles({
     else setError(result.error?.error.message ?? "Staging failed.");
   }
 
-  function onPublish() {
+  async function onPublish() {
     setError(null);
     if (!stage) return;
-    const result = sharedTransport().publishCatalog(stage.stageId, {
+    const result = await sharedTransport().publishCatalog(stage.stageId, {
       approvePublication: true,
       expectedSourceVersion: stage.sourceVersion,
     });

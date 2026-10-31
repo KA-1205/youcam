@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import { findVariant } from "../lib/fixture/demo-catalog";
 import { formatMinor } from "../lib/format";
-import { sharedTransport } from "../lib/fixture/transport";
+import { sharedTransport, transportMode } from "../lib/transport";
 import { useSession } from "../lib/session-context";
 import type { components } from "../../../../contracts/runtime/client";
 
@@ -44,13 +44,15 @@ export function CheckoutView({ onOrderPlaced }: { onOrderPlaced: (orderId: strin
 
   useEffect(() => {
     if (!snapshot || lines.length === 0) return;
-    const result = sharedTransport().quoteCart({
-      expectedSessionVersion: snapshot.sessionVersion,
-      lines,
-      sessionId: snapshot.sessionId,
-    });
-    if (result.data) setQuote(result.data);
-    else setError(result.error?.error.message ?? "Could not price the cart.");
+    void (async () => {
+      const result = await sharedTransport().quoteCart({
+        expectedSessionVersion: snapshot.sessionVersion,
+        lines,
+        sessionId: snapshot.sessionId,
+      });
+      if (result.data) setQuote(result.data);
+      else setError(result.error?.error.message ?? "Could not price the cart.");
+    })();
     // Re-quoted after claim too: claiming the guest session bumps its version.
   }, [snapshot?.sessionVersion, snapshot?.selections.length, claimed]);
 
@@ -72,7 +74,7 @@ export function CheckoutView({ onOrderPlaced }: { onOrderPlaced: (orderId: strin
     if (!snapshot || !quote) return;
     setBusy(true);
     setError(null);
-    const result = sharedTransport().confirmCheckout(
+    const result = await sharedTransport().confirmCheckout(
       {
         addressReference: address,
         confirmPurchase: true,
@@ -219,18 +221,24 @@ export function CheckoutView({ onOrderPlaced }: { onOrderPlaced: (orderId: strin
               </label>
             </span>
           </div>
-          <div className="field">
-            <span>
-              <label htmlFor="outcome">Demo payment outcome (fixture-only control)</label>
-            </span>
-            <select id="outcome" value={outcome} onChange={(e) => setOutcome(e.target.value as DemoOutcome)}>
-              {OUTCOMES.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {transportMode() === "FIXTURE" ? (
+            <div className="field">
+              <span>
+                <label htmlFor="outcome">Demo payment outcome (fixture-only control)</label>
+              </span>
+              <select id="outcome" value={outcome} onChange={(e) => setOutcome(e.target.value as DemoOutcome)}>
+                {OUTCOMES.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <p className="footnote">
+              The labelled demo payment port on the server decides the outcome; no card form exists.
+            </p>
+          )}
           {error ? (
             <p className="error-note" role="alert">
               {error}

@@ -1,12 +1,12 @@
 """Anchor Fit API: C-owned HTTP delivery with real access/profile behavior.
 
-A-owned operations (catalog, stylist, proposals) remain foundation 501s until
-lane A is integrated; C-owned operations activate per ticket. Frozen contracts
-in contracts.runtime are never modified here.
+A-owned operations (catalog, stylist, proposals) are served by lane A services
+composed in apps.api.integration behind the frozen contracts. C-owned
+operations activate per ticket. Frozen contracts in contracts.runtime are never
+modified here.
 """
 import os
-from collections.abc import Iterator
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID, uuid4
 
 import sqlalchemy
@@ -14,20 +14,38 @@ from fastapi import Depends, FastAPI, Header, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.exceptions import HTTPException
 
+from apps.api import clock
 from apps.api.db import Database
-from apps.api.demo_catalog import FixtureCatalog
-from apps.api.errors import ApiError
+from apps.api.errors import (
+    SCOPE_FORBIDDEN,
+    STALE_VERSION,
+    ApiError,
+)
+from apps.api.integration import (
+    IntegratedCatalog,
+    ShareRegistry,
+    build_broker,
+    lane_api_error,
+    require_consent_revision,
+)
+from apps.api.modules.commerce.models import OrderRow
 from apps.api.modules.commerce.ports import DemoPaymentPort
 from apps.api.modules.commerce.service import CommerceService, replay, store
+from apps.api.modules.merchant_insights.service import InsightsService
+from apps.api.modules.shopper_profile.models import WardrobeItem
 from apps.api.modules.shopper_profile.service import ProfileService
 from apps.api.modules.storage.backend import create_backend
 from apps.api.modules.storage.service import StorageService
+from apps.api.modules.styling_session.models import StylingSessionRow
 from apps.api.modules.styling_session.service import SessionService
+from apps.api.modules.task_runtime.models import DurableTaskRow
 from apps.api.modules.task_runtime.service import TaskService
 from apps.api.modules.tenant_access.models import Account as AccessAccount
+from apps.api.modules.tenant_access.models import Actor
 from apps.api.modules.tenant_access.service import (
     COOKIE_NAME,
     AccessService,
@@ -39,6 +57,12 @@ from apps.api.ratelimit import RateLimiter
 from contracts.runtime import models as m
 from contracts.runtime.routes import ROUTES
 from contracts.runtime.transport import SECURITY_HEADERS, error
+from services.catalog.errors import CatalogError
+from services.recommendations.errors import RecommendationError
+from services.stylist.errors import StylistError
+from services.stylist.proposals import ProposalService
+
+LANE_ERRORS = (CatalogError, RecommendationError, StylistError)
 
 
 class DevLoginRequest(BaseModel):
@@ -52,7 +76,7 @@ class DevLoginRequest(BaseModel):
 
 def create_app(database_url: str | None = None) -> FastAPI:
     database = Database(database_url)
-    catalog = FixtureCatalog()
+    catalog = IntegratedCatalog()
     access_service = AccessService()
     profile_service = ProfileService(resolve_slot=catalog.slot_for)
     session_service = SessionService(catalog)
@@ -65,6 +89,19 @@ def create_app(database_url: str | None = None) -> FastAPI:
                                      profile_service.consent_snapshot,
                                      storage_service.store_render_result, task_service,
                                      storage_service.asset_available)
+    broker = build_broker()
+
+    def actor_account(actor_id: str) -> str | None:
+        with database.unit_of_work() as session:
+            actor = session.get(Actor, actor_id)
+            return actor.account_id if actor else None
+
+    shares = ShareRegistry(actor_account)
+    proposals = ProposalService(shared=shares)
+    proposal_sessions: dict[UUID, UUID] = {}
+    # In-process demo evidence for the insights dashboard (mode DEMO, single process).
+    stylist_ledger: list[dict[str, Any]] = []
+    insights_service = InsightsService()
 
     def ctx_of(db: Session, identity: Identity) -> m.AccessContext:
         revision = profile_service.latest_revision(db, identity.actor_id)
@@ -73,9 +110,8 @@ def create_app(database_url: str | None = None) -> FastAPI:
                   description='C-owned HTTP delivery; live providers stay disabled until '
                               'verified activation.')
 
-    def get_db() -> Iterator[Session]:
-        with database.unit_of_work() as session:
-            yield session
+    def get_db(request: Request) -> Session:
+        return request.state.db
 
     def get_identity(request: Request, response: Response,
                      db: Session = Depends(get_db)) -> Identity:
@@ -271,6 +307,248 @@ def create_app(database_url: str | None = None) -> FastAPI:
                            db: Session = Depends(get_db)) -> m.PreviewJob:
         return preview_service.cancel(db, ctx_of(db, identity), jobId)
 
+    # -- lane A surface: catalog, stylist jobs, proposals, staging ------------
+
+    def list_catalog_variants(cursor: str | None = Query(default=None),
+                              limit: int = Query(default=30, ge=1, le=100),
+                              search: str | None = Query(default=None, min_length=1,
+                                                         max_length=200),
+                              slot: m.Slot | None = Query(default=None),
+                              brandKind: Literal['OWN', 'SPONSOR'] | None = Query(default=None),
+                              inStock: bool | None = Query(default=None),
+                              identity: Identity = Depends(get_identity),
+                              db: Session = Depends(get_db)) -> m.CatalogPage:
+        ctx = ctx_of(db, identity)
+        query = m.CatalogQuery(search=search, slot=slot, brandKind=brandKind, inStock=inStock)
+        try:
+            return catalog.list_variants(ctx, cursor, limit, query)
+        except LANE_ERRORS as exc:
+            raise lane_api_error(exc) from None
+
+    def get_catalog_variant(variantId: str, identity: Identity = Depends(get_identity),
+                            db: Session = Depends(get_db)) -> m.CatalogVariant:
+        ctx = ctx_of(db, identity)
+        try:
+            return catalog.variant(ctx, variantId)
+        except LANE_ERRORS as exc:
+            raise lane_api_error(exc) from None
+
+    def create_stylist_job(body: m.StylistRequest,
+                           idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                           identity: Identity = Depends(get_identity),
+                           db: Session = Depends(get_db)) -> m.JobAccepted:
+        ctx = ctx_of(db, identity)
+        try:
+            session = session_service.snapshot(db, ctx, body.sessionId)
+            profile = get_profile(identity, db)
+            accepted = broker.submit(ctx, body, session, catalog.full_snapshot(ctx), profile,
+                                     idempotency_key=idempotency_key, now=clock.now())
+        except LANE_ERRORS as exc:
+            raise lane_api_error(exc) from None
+        if isinstance(accepted, m.JobAccepted):
+            # Fixture mode runs the queued job inline; live deployments drive it
+            # from the durable worker instead.
+            broker.run(accepted.jobId, now=clock.now())
+            job = broker.get(accepted.jobId, ctx)
+            stylist_ledger.append({
+                'at': clock.now(), 'actorId': ctx.actorId,
+                'looks': len(job.result.looks)
+                if isinstance(job.result, m.LooksResult) else 0})
+        return m.JobAccepted(jobId=accepted.jobId,
+                             statusUrl=f'/api/stylist-jobs/{accepted.jobId}',
+                             status='QUEUED', sessionVersion=body.expectedSessionVersion)
+
+    def get_stylist_job(jobId: UUID, identity: Identity = Depends(get_identity),
+                        db: Session = Depends(get_db)) -> m.StylistJob:
+        ctx = ctx_of(db, identity)
+        try:
+            job = broker.get(jobId, ctx)
+        except StylistError as exc:
+            raise lane_api_error(exc) from None
+        try:
+            session = session_service.snapshot(db, ctx, job.sessionId)
+        except ApiError:
+            return job
+        return broker.get(jobId, ctx, current_session_version=session.sessionVersion)
+
+    def cancel_stylist_job(jobId: UUID, identity: Identity = Depends(get_identity),
+                           db: Session = Depends(get_db)) -> m.StylistJob:
+        try:
+            return broker.cancel(jobId, ctx_of(db, identity))
+        except StylistError as exc:
+            raise lane_api_error(exc) from None
+
+    def apply_look(sessionId: UUID, body: m.ApplyLook,
+                   identity: Identity = Depends(get_identity),
+                   db: Session = Depends(get_db)) -> m.SessionSnapshot:
+        ctx = ctx_of(db, identity)
+        try:
+            job = broker.get(body.jobId, ctx)
+        except StylistError as exc:
+            raise lane_api_error(exc) from None
+        if job.sessionId != sessionId or job.status != 'SUCCEEDED' \
+                or not isinstance(job.result, m.LooksResult):
+            raise ApiError(404, 'NOT_FOUND', 'No completed look exists for this job.')
+        look = next((item for item in job.result.looks if item.lookId == body.lookId), None)
+        if look is None:
+            raise ApiError(404, 'NOT_FOUND', 'Unknown look for this job.')
+        return session_service.apply(db, ctx, sessionId, body.expectedSessionVersion,
+                                     list(look.items), [], None)
+
+    def create_share(body: m.ShareCreate,
+                     idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                     identity: Identity = Depends(get_identity),
+                     db: Session = Depends(get_db)) -> m.ShareSnapshot:
+        if not identity.verified:
+            raise ApiError(403, SCOPE_FORBIDDEN, 'Sharing requires a verified account.')
+        ctx = ctx_of(db, identity)
+        session = session_service.snapshot(db, ctx, body.sessionId)
+        if body.expectedSessionVersion != session.sessionVersion:
+            raise ApiError(409, STALE_VERSION, 'Session changed; refresh and retry.')
+        require_consent_revision(session, body.expectedConsentRevision)
+        if db.get(AccessAccount, body.recipientAccountId) is None:
+            raise ApiError(404, 'NOT_FOUND', 'Unknown recipient account.')
+        return shares.create(ctx, body, session)
+
+    def revoke_share(shareId: UUID, identity: Identity = Depends(get_identity),
+                     db: Session = Depends(get_db)) -> m.ShareSnapshot:
+        return shares.revoke(ctx_of(db, identity), shareId)
+
+    def create_proposal(body: m.ProposalCreate,
+                        idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                        identity: Identity = Depends(get_identity),
+                        db: Session = Depends(get_db)) -> m.ProposalSnapshot:
+        ctx = ctx_of(db, identity)
+        try:
+            session = session_service.read_shared(db, ctx, body.sessionId)
+            proposal = proposals.create(ctx, body, session, catalog.full_snapshot(ctx))
+        except LANE_ERRORS as exc:
+            raise lane_api_error(exc) from None
+        proposal_sessions[proposal.proposalId] = body.sessionId
+        return proposal
+
+    def get_proposal(proposalId: UUID, identity: Identity = Depends(get_identity),
+                     db: Session = Depends(get_db)) -> m.ProposalSnapshot:
+        ctx = ctx_of(db, identity)
+        session_id = proposal_sessions.get(proposalId)
+        if session_id is None:
+            raise ApiError(404, 'NOT_FOUND', 'Unknown or non-owned resource.')
+        try:
+            session = session_service.read_shared(db, ctx, session_id)
+            return proposals.get(ctx, proposalId, session)
+        except StylistError as exc:
+            raise lane_api_error(exc) from None
+
+    def apply_proposal(proposalId: UUID, body: m.ProposalApply,
+                       idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                       identity: Identity = Depends(get_identity),
+                       db: Session = Depends(get_db)) -> m.SessionSnapshot:
+        ctx = ctx_of(db, identity)
+        session_id = proposal_sessions.get(proposalId)
+        if session_id is None:
+            raise ApiError(404, 'NOT_FOUND', 'Unknown or non-owned resource.')
+        try:
+            session = session_service.snapshot(db, ctx, session_id)
+            proposal = proposals.get(ctx, proposalId, session)
+            selections = proposals.validate_application(proposal, session, body,
+                                                        catalog.full_snapshot(ctx))
+            updated = session_service.apply(db, ctx, session_id, body.expectedSessionVersion,
+                                            selections, list(body.approvedExceptionIds),
+                                            proposal.brief)
+        except LANE_ERRORS as exc:
+            raise lane_api_error(exc) from None
+        proposals.record_outcome(proposalId, accepted=True)
+        return updated
+
+    def request_proposal_refresh(proposalId: UUID, body: m.ProposalRefresh,
+                                 idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                                 identity: Identity = Depends(get_identity),
+                                 db: Session = Depends(get_db)) -> m.Ack:
+        ctx = ctx_of(db, identity)
+        session_id = proposal_sessions.get(proposalId)
+        if session_id is None:
+            raise ApiError(404, 'NOT_FOUND', 'Unknown or non-owned resource.')
+        try:
+            session = session_service.snapshot(db, ctx, session_id)
+            return proposals.refresh(ctx, proposalId, body, session)
+        except StylistError as exc:
+            raise lane_api_error(exc) from None
+
+    def require_role(ctx: m.AccessContext, *roles: str) -> None:
+        if not set(roles) & set(ctx.roles):
+            raise ApiError(403, SCOPE_FORBIDDEN, 'This action needs merchant scope.')
+
+    def stage_catalog(body: m.CatalogBatch,
+                      idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                      identity: Identity = Depends(get_identity),
+                      db: Session = Depends(get_db)) -> m.CatalogStage:
+        ctx = ctx_of(db, identity)
+        require_role(ctx, 'MERCHANT_ADMIN', 'PLATFORM_OPERATOR')
+        if any(variant.tenantId != ctx.tenantId for variant in body.variants):
+            raise ApiError(422, 'VALIDATION_ERROR',
+                           'Staged variants must belong to the merchant tenant.')
+        return catalog.stage(ctx, body)
+
+    def publish_catalog(stageId: UUID, body: m.PublishStage,
+                        idempotency_key: UUID = Header(alias='Idempotency-Key'),
+                        identity: Identity = Depends(get_identity),
+                        db: Session = Depends(get_db)) -> m.Ack:
+        ctx = ctx_of(db, identity)
+        require_role(ctx, 'MERCHANT_ADMIN', 'PLATFORM_OPERATOR')
+        return catalog.publish(ctx, stageId, body)
+
+    def get_insights(cursor: str | None = Query(default=None),
+                     limit: int = Query(default=100, ge=1, le=100),
+                     identity: Identity = Depends(get_identity),
+                     db: Session = Depends(get_db)) -> m.Insights:
+        ctx = ctx_of(db, identity)
+        require_role(ctx, 'MERCHANT_ADMIN', 'PLATFORM_OPERATOR')
+
+        def counts(start, end):
+            def windowed(rows, at_index, actor_index):
+                current = [(clock.as_utc(row[at_index]), row[actor_index]) for row in rows]
+                inside = [(at, actor) for at, actor in current if start <= at <= end]
+                return (len(inside), len({actor for _, actor in inside}))
+
+            sessions = db.execute(select(StylingSessionRow.created_at,
+                                         StylingSessionRow.owner_actor_id)).all()
+            saves = db.execute(select(WardrobeItem.updated_at, WardrobeItem.account_id)
+                               .where(WardrobeItem.saved.is_(True))).all()
+            orders = db.execute(select(OrderRow.created_at, OrderRow.account_id)).all()
+            previews = db.execute(select(DurableTaskRow.created_at, DurableTaskRow.actor_id)
+                                  .where(DurableTaskRow.operation == 'PREVIEW')).all()
+            requests = [entry for entry in stylist_ledger if start <= clock.as_utc(entry['at']) <= end]
+            looks = sum(entry['looks'] for entry in requests)
+            look_actors = {entry['actorId'] for entry in requests if entry['looks']}
+            return {
+                'qualifiedSessions': windowed(sessions, 0, 1),
+                'wardrobeSaves': windowed(saves, 0, 1),
+                'orders': windowed(orders, 0, 1),
+                'previewJobs': windowed(previews, 0, 1),
+                'stylistRequests': (len(requests), len({entry['actorId'] for entry in requests})),
+                'generatedLooks': (looks, len(look_actors)),
+            }
+
+        return insights_service.page(counts)
+
+    def delete_account(identity: Identity = Depends(get_identity),
+                       db: Session = Depends(get_db)) -> m.Ack:
+        if not identity.verified or identity.account_id is None:
+            raise ApiError(403, SCOPE_FORBIDDEN,
+                           'Account deletion requires a verified account.')
+        try:
+            actor_ids = access_service.delete_account(db, identity.account_id)
+        except LookupError:
+            raise ApiError(404, 'NOT_FOUND', 'Unknown or non-owned resource.') from None
+        now = clock.now()
+        task_service.cancel_for_actors(db, actor_ids, now)
+        storage_service.revoke_for_actors(db, actor_ids)
+        session_ids = [UUID(row) for row in db.scalars(select(StylingSessionRow.session_id)
+                                                       .where(StylingSessionRow.owner_actor_id
+                                                              .in_(actor_ids)))]
+        shares.revoke_all_for(identity.account_id, session_ids)
+        return m.Ack(requestId=uuid4(), status='ACCEPTED')
+
     HANDLERS: dict[str, Any] = {
         'getProfile': get_profile,
         'updateConsent': update_consent,
@@ -280,6 +558,22 @@ def create_app(database_url: str | None = None) -> FastAPI:
         'getSession': get_session,
         'editSession': edit_session,
         'claimSession': claim_session,
+        'applyLook': apply_look,
+        'createStylistJob': create_stylist_job,
+        'getStylistJob': get_stylist_job,
+        'cancelStylistJob': cancel_stylist_job,
+        'listVariants': list_catalog_variants,
+        'getVariant': get_catalog_variant,
+        'stageCatalog': stage_catalog,
+        'publishCatalog': publish_catalog,
+        'getInsights': get_insights,
+        'deleteAccount': delete_account,
+        'createShare': create_share,
+        'revokeShare': revoke_share,
+        'createProposal': create_proposal,
+        'getProposal': get_proposal,
+        'applyProposal': apply_proposal,
+        'requestProposalRefresh': request_proposal_refresh,
         'quoteCart': quote_cart,
         'confirmCheckout': confirm_checkout,
         'getOrder': get_order,
@@ -303,6 +597,30 @@ def create_app(database_url: str | None = None) -> FastAPI:
     async def security_headers(request: Request, call_next):
         response = await call_next(request)
         response.headers.update(SECURITY_HEADERS)
+        return response
+
+    @app.middleware('http')
+    async def commit_before_transmission(request: Request, call_next):
+        """Own the unit of work outside the routing stack.
+
+        Yield-dependency teardown runs after the response is transmitted, so a
+        commit there acknowledges writes before they are durable. Committing in
+        middleware (5xx and failures roll back) keeps every acknowledged write
+        committed before the response starts.
+        """
+        session = database.sessions()
+        request.state.db = session
+        try:
+            response = await call_next(request)
+        except Exception:
+            session.rollback()
+            session.close()
+            raise
+        if response.status_code < 500:
+            session.commit()
+        else:
+            session.rollback()
+        session.close()
         return response
 
     @app.middleware('http')
@@ -395,6 +713,10 @@ def create_app(database_url: str | None = None) -> FastAPI:
     app.state.task_service = task_service
     app.state.storage_service = storage_service
     app.state.preview_service = preview_service
+    app.state.catalog = catalog
+    app.state.stylist_broker = broker
+    app.state.shares = shares
+    app.state.proposals = proposals
     return app
 
 

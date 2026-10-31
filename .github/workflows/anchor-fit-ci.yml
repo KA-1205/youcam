@@ -130,9 +130,12 @@ jobs:
           DATABASE_URL: postgresql+psycopg://anchor_ci@127.0.0.1:5432/anchor_fit_ci
         run: |
           uv run alembic -c infra/migrations/alembic.ini upgrade head
-          uv run alembic -c infra/migrations/alembic.ini current
+          # A silent rollback prints no revision; require the head to be recorded.
+          uv run alembic -c infra/migrations/alembic.ini current | grep -q "(head)"
           uv run alembic -c infra/migrations/alembic.ini downgrade base
+          test -z "$(uv run alembic -c infra/migrations/alembic.ini current)"
           uv run alembic -c infra/migrations/alembic.ini upgrade head
+          uv run alembic -c infra/migrations/alembic.ini current | grep -q "(head)"
       - name: API boot
         run: |
           uv run uvicorn apps.api.main:app --host 127.0.0.1 --port 8000 > /tmp/anchor-api.log 2>&1 &

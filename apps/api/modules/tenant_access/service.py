@@ -120,7 +120,8 @@ class AccessService:
         ensure_tenant(db, tenant_id)
         canonical = email.strip().lower()
         account = db.scalar(select(Account).where(Account.tenant_id == tenant_id,
-                                                  Account.email == canonical))
+                                                  Account.email == canonical,
+                                                  Account.deleted_at.is_(None)))
         if account is None:
             account = Account(account_id=f'acct:{uuid4().hex}', tenant_id=tenant_id,
                               email=canonical, verified_at=clock.now(), preferences={},
@@ -154,6 +155,29 @@ class AccessService:
         row = db.get(AuthSession, token_hash(cookie_token))
         if row is not None:
             row.revoked_at = clock.now()
+
+    def delete_account(self, db: Session, account_id: str) -> list[str]:
+        """Tombstone the account: every session it issued stops resolving now.
+
+        The tombstone also denies re-login through the same row. Returns the
+        actor ids that belonged to the account so composition can cancel its
+        queued work, revoke its assets and close its shares in the same
+        transaction. First-party rows are purged later by the worker sweep.
+        """
+        account = db.get(Account, account_id)
+        if account is None or account.deleted_at is not None:
+            raise LookupError('Unknown or non-owned resource.')
+        now = clock.now()
+        account.deleted_at = now
+        # Free the unique email immediately so the identity can re-register
+        # fresh; the tombstone row keeps the ledger reference until the purge.
+        account.email = f'deleted:{account.account_id}@invalid'
+        actors = list(db.scalars(select(Actor).where(Actor.account_id == account_id)))
+        for actor in actors:
+            for row in db.scalars(select(AuthSession).where(AuthSession.actor_id
+                                                            == actor.actor_id)):
+                row.revoked_at = row.revoked_at or now
+        return [actor.actor_id for actor in actors]
 
 
 __all__ = ['COOKIE_NAME', 'AccessBase', 'AccessService', 'GUEST_TTL', 'Identity', 'demo_mode_enabled',

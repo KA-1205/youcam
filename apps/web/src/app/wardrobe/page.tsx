@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { VARIANTS, findVariant } from "../../lib/fixture/demo-catalog";
 import { formatMinor } from "../../lib/format";
-import { sharedTransport } from "../../lib/fixture/transport";
+import { sharedTransport } from "../../lib/transport";
 import { WardrobeList, WARDROBE_FILTERS, displayState } from "../../components/wardrobe-list";
 import { useSession } from "../../lib/session-context";
 import { useShortlist } from "../../lib/shortlist-context";
@@ -24,8 +24,8 @@ export default function WardrobePage() {
   const [savedFlag, setSavedFlag] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const reload = useCallback(() => {
-    const page = sharedTransport().listWardrobe();
+  const reload = useCallback(async () => {
+    const page = await sharedTransport().listWardrobe();
     if (page.data) {
       // Product-only shortlist saves surface even without ownership records.
       const withSaves = new Map(page.data.items.map((i) => [`${i.reference.slot}:${i.reference.refId}`, i]));
@@ -51,7 +51,7 @@ export default function WardrobePage() {
   }, [savedIds]);
 
   useEffect(() => {
-    reload();
+    void reload();
   }, [reload]);
 
   async function onAddManual() {
@@ -61,14 +61,14 @@ export default function WardrobePage() {
       setError("Choose a catalog variant.");
       return;
     }
-    const result = sharedTransport().saveWardrobeItem({
+    const result = await sharedTransport().saveWardrobeItem({
       attributesConfirmed: true,
       manualOwnedQuantity: Math.max(0, Math.round(Number(manualQuantity) || 0)),
       reference: { slot: variant.slot, refType: "VARIANT", refId: variant.variantId },
       saved: savedFlag,
     });
     if (result.error) setError(result.error.error.message);
-    reload();
+    await reload();
   }
 
   const filtered = items.filter((i) => {

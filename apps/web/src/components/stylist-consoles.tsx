@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { describeItem } from "../lib/describe";
 import { formatStamp } from "../lib/format";
-import { sharedTransport } from "../lib/fixture/transport";
+import { sharedTransport } from "../lib/transport";
 import { useSession } from "../lib/session-context";
 import type { components } from "../../../../contracts/runtime/client";
 
@@ -37,6 +37,7 @@ export function StylistConsoles() {
   const [exceptionText, setExceptionText] = useState("");
   const [proposal, setProposal] = useState<ProposalSnapshot | null>(null);
   const [approvedExceptions, setApprovedExceptions] = useState<string[]>([]);
+  const [sharedSession, setSharedSession] = useState<SessionSnapshot | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,10 +45,25 @@ export function StylistConsoles() {
     setShares(sharedTransport().listShares(STYLIST_ACCOUNT).data ?? []);
   }, [share]);
 
+  useEffect(() => {
+    let active = true;
+    if (shares.length > 0) {
+      void (async () => {
+        const result = await sharedTransport().getSession(shares[0].sessionId);
+        if (active) setSharedSession(result.data ?? null);
+      })();
+    } else {
+      setSharedSession(null);
+    }
+    return () => {
+      active = false;
+    };
+  }, [shares]);
+
   async function onShare() {
     setError(null);
     if (!snapshot) return;
-    const result = sharedTransport().createShare({
+    const result = await sharedTransport().createShare({
       expectedConsentRevision: snapshot.consentRevision,
       expectedSessionVersion: snapshot.sessionVersion,
       includedAssetIds: [],
@@ -62,19 +78,19 @@ export function StylistConsoles() {
     }
   }
 
-  function onRevoke() {
+  async function onRevoke() {
     if (!share) return;
-    const result = sharedTransport().revokeShare(share.shareId);
+    const result = await sharedTransport().revokeShare(share.shareId);
     if (result.data) {
       setShare(null);
       setMessage("Share revoked. The stylist loses access immediately.");
     }
   }
 
-  function onSubmitProposal() {
+  async function onSubmitProposal() {
     setError(null);
     if (!snapshot) return;
-    const result = sharedTransport().createProposal({
+    const result = await sharedTransport().createProposal({
       baseSessionVersion: snapshot.sessionVersion,
       brief: snapshot.brief,
       exceptions:
@@ -96,10 +112,10 @@ export function StylistConsoles() {
     else setError(result.error?.error.message ?? "Could not submit the proposal.");
   }
 
-  function onApply() {
+  async function onApply() {
     setError(null);
     if (!proposal || !snapshot) return;
-    const result = sharedTransport().applyProposal(proposal.proposalId, {
+    const result = await sharedTransport().applyProposal(proposal.proposalId, {
       accept: true,
       approvedExceptionIds: approvedExceptions,
       expectedSessionVersion: snapshot.sessionVersion,
@@ -111,8 +127,6 @@ export function StylistConsoles() {
       setError(result.error?.error.message ?? "Could not apply the proposal.");
     }
   }
-
-  const sharedSession = shares.length > 0 ? sharedTransport().getSession(shares[0].sessionId).data : null;
 
   return (
     <>

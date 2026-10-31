@@ -6,7 +6,7 @@ import { PhotoCapture } from "../../components/photo-capture";
 import { VARIANTS, findVariant } from "../../lib/fixture/demo-catalog";
 import { formatStamp } from "../../lib/format";
 import { INITIAL_PREVIEW, capabilitySlots, previewReducer } from "../../lib/preview-state";
-import { sharedTransport } from "../../lib/fixture/transport";
+import { sharedTransport } from "../../lib/transport";
 import { useSession } from "../../lib/session-context";
 import type { components } from "../../../../../contracts/runtime/client";
 
@@ -34,13 +34,15 @@ export default function PreviewPage() {
   const [adult, setAdult] = useState(false);
 
   useEffect(() => {
-    sessionActions.restore();
-    const page = sharedTransport().listCapabilities();
-    if (page.data) setCapabilities(page.data.items);
-    const requested = new URLSearchParams(window.location.search).get("capability");
-    if (requested && TABS.includes(requested)) {
-      dispatch({ type: "SET_CAPABILITY", capability: requested });
-    }
+    void (async () => {
+      await sessionActions.restore();
+      const page = await sharedTransport().listCapabilities();
+      if (page.data) setCapabilities(page.data.items);
+      const requested = new URLSearchParams(window.location.search).get("capability");
+      if (requested && TABS.includes(requested)) {
+        dispatch({ type: "SET_CAPABILITY", capability: requested });
+      }
+    })();
   }, []);
 
   const snapshot = sessionState.snapshot;
@@ -48,7 +50,7 @@ export default function PreviewPage() {
   async function onUpload() {
     if (!snapshot) return;
     dispatch({ type: "BUSY", busy: true });
-    const prepared = sharedTransport().prepareAssetUpload(
+    const prepared = await sharedTransport().prepareAssetUpload(
       {
         capability: "CLOTHES_V4",
         contentType: "image/jpeg",
@@ -62,7 +64,7 @@ export default function PreviewPage() {
       dispatch({ type: "ERROR", message: prepared.error?.error.message ?? "Upload failed." });
       return;
     }
-    const available = sharedTransport().markUploaded(prepared.data.assetId);
+    const available = await sharedTransport().markUploaded(prepared.data.assetId);
     if (available.error || !available.data) {
       dispatch({ type: "ERROR", message: available.error?.error.message ?? "Upload failed." });
       return;
@@ -92,7 +94,7 @@ export default function PreviewPage() {
       dispatch({ type: "SUPERSEDED" });
     }
     dispatch({ type: "BUSY", busy: true });
-    const created = sharedTransport().createPreviewJob({
+    const created = await sharedTransport().createPreviewJob({
       capability: preview.capability as components["schemas"]["PreviewRequest"]["capability"],
       effectIds: [],
       expectedConsentRevision: snapshot.consentRevision,
@@ -106,10 +108,10 @@ export default function PreviewPage() {
       dispatch({ type: "ERROR", message: created.error?.error.message ?? "Could not create the preview job." });
       return;
     }
-    let job = sharedTransport().getPreviewJob(created.data.jobId).data;
+    let job = (await sharedTransport().getPreviewJob(created.data.jobId)).data;
     for (let i = 0; i < 12 && job && job.status !== "SUCCEEDED" && job.status !== "CANCELLED"; i += 1) {
       await new Promise((r) => setTimeout(r, 120));
-      job = sharedTransport().getPreviewJob(created.data.jobId).data;
+      job = (await sharedTransport().getPreviewJob(created.data.jobId)).data;
     }
     if (!job) {
       dispatch({ type: "ERROR", message: "The preview job disappeared." });
@@ -183,7 +185,7 @@ export default function PreviewPage() {
                     checked={consented}
                     onChange={async (e) => {
                       setConsented(e.target.checked);
-                      const updated = sharedTransport().updateConsent({
+                      const updated = await sharedTransport().updateConsent({
                         adultAttestation: adult,
                         assetIds: preview.asset ? [preview.asset.assetId] : [],
                         controls: {

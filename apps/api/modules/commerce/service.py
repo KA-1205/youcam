@@ -90,9 +90,7 @@ class CommerceService:
         self._task_enqueue = task_enqueue
 
     def warehouse(self, db: Session, tenant_id: str) -> DemoWarehousePort:
-        from apps.api.demo_catalog import FixtureCatalog
-
-        assert isinstance(self._catalog, FixtureCatalog)
+        # The composed catalog exposes the demo seed regardless of lane adapter.
         return DemoWarehousePort(db, tenant_id, self._catalog.seed_stock())
 
     # Quotes -----------------------------------------------------------------

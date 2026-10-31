@@ -4,35 +4,47 @@ import json
 import os
 import socket
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from apps.api.db import Database
-from apps.api.demo_catalog import FixtureCatalog
 from apps.api.errors import ApiError
+from apps.api.integration import IntegratedCatalog
 from apps.api.modules.commerce.models import OrderRow, OutboxEventRow
 from apps.api.modules.commerce.ports import DemoPaymentPort
 from apps.api.modules.commerce.service import CommerceService
+from apps.api.modules.shopper_profile.models import (
+    CommerceEventRecord,
+    ConsentRevision,
+    OrderLineContribution,
+    OrderProgressRecord,
+    WardrobeItem,
+)
 from apps.api.modules.shopper_profile.service import ProfileService
 from apps.api.modules.storage.backend import StorageBackend, create_backend
 from apps.api.modules.storage.models import AssetRow
 from apps.api.modules.storage.service import StorageService
+from apps.api.modules.styling_session.models import StylingSessionRow
 from apps.api.modules.styling_session.service import SessionService
 from apps.api.modules.task_runtime.models import DurableTaskRow
 from apps.api.modules.task_runtime.service import TaskService
+from apps.api.modules.tenant_access.models import Account as AccessAccount
+from apps.api.modules.tenant_access.models import Actor
 from apps.api.modules.tenant_access.service import AccessService
 from apps.api.modules.try_on_jobs.orchestration import PreviewService
 from contracts.runtime.models import CommerceEvent
 
 OUTBOX_TTL_MARK = 'PUBLISHED'
+PURGE_DELAY = timedelta(days=7)
 
 
 @dataclass
 class Runtime:
     database: Database
-    catalog: FixtureCatalog
+    catalog: IntegratedCatalog
     access: AccessService
     profile: ProfileService
     sessions: SessionService
@@ -52,6 +64,7 @@ class Runtime:
             summary['reclaimedLeases'] = self.tasks.reclaim_expired_leases(db, _now())
             summary['reconciledTimeouts'] = self._reconcile_timeouts(db)
             summary['expiredAssets'] = self.storage.sweep_expired(db)
+        summary['purgedAccounts'] = purge_deleted_accounts(self.database, _now())['purgedAccounts']
         for _ in range(max_tasks):
             outcome = self._run_one()
             if outcome is None:
@@ -150,8 +163,45 @@ class Runtime:
             return enqueued
 
 
+def purge_deleted_accounts(database: Database, now: datetime) -> dict:
+    """FR-092: first-party removal for accounts deleted at least seven days ago.
+
+    Access was already revoked at tombstone time; this removes the remaining
+    personal rows (wardrobe, contributions, events, consent history, sessions,
+    assets, queued tasks) and anonymizes the retained ledger tombstone.
+    """
+    summary = {'purgedAccounts': 0}
+    threshold = now - PURGE_DELAY
+    with database.unit_of_work() as db:
+        accounts = db.scalars(select(AccessAccount)
+                              .where(AccessAccount.deleted_at.is_not(None),
+                                     AccessAccount.deleted_at <= threshold)).all()
+        for account in accounts:
+            actor_ids = [row.actor_id for row in db.scalars(
+                select(Actor).where(Actor.account_id == account.account_id))]
+            for model in (WardrobeItem, OrderLineContribution, CommerceEventRecord,
+                          OrderProgressRecord):
+                db.query(model).filter(
+                    model.account_id == account.account_id).delete(synchronize_session=False)
+            if actor_ids:
+                db.query(StylingSessionRow).filter(
+                    StylingSessionRow.owner_actor_id.in_(actor_ids)).delete(
+                    synchronize_session=False)
+                db.query(ConsentRevision).filter(
+                    ConsentRevision.actor_id.in_(actor_ids)).delete(synchronize_session=False)
+                db.query(AssetRow).filter(
+                    AssetRow.actor_id.in_(actor_ids)).delete(synchronize_session=False)
+                db.query(DurableTaskRow).filter(
+                    DurableTaskRow.actor_id.in_(actor_ids)).delete(synchronize_session=False)
+            account.email = f'purged:{account.account_id}@invalid'
+            account.preferences = {}
+            summary['purgedAccounts'] += 1
+        db.flush()
+    return summary
+
+
 def build_runtime(database: Database, client_factory=None) -> Runtime:
-    catalog = FixtureCatalog()
+    catalog = IntegratedCatalog()
     profile = ProfileService(resolve_slot=catalog.slot_for)
     sessions = SessionService(catalog)
     tasks = TaskService()

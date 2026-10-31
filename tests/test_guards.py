@@ -51,6 +51,30 @@ def test_github_merge_commit_on_main_allowed():
     assert not commit_message_errors(message, 'main', 2)
 
 
+def test_github_squash_merge_commit_on_main_allowed():
+    assert not commit_message_errors(
+        'Web studio shopper and staff surfaces (#5)\n\n'
+        '* build web application shell\n\n* add brief and studio flow\n', 'main', 1)
+    assert not commit_message_errors(
+        'add platform integration services\n\n'
+        '* Implement access and profile persistence\n\n* Build durable task runtime\n',
+        'main', 1)
+
+
+@pytest.mark.parametrize('branch,parents,message', [
+    ('feature/catalog-stylist', 1, 'Fix contract (#5)\n\n* fix contract\n'),
+    ('main', 1, 'Fix contract (#5)\n\nfix contract\n'),
+    ('main', 1, 'Add AI feature (#5)\n\n* add ai feature\n'),
+    ('main', 1, 'Fix contract (#5)\n\n* Add AI foundation\n'),
+    ('main', 1, 'Fix contract (#5)\n\n* fix contract\nStray text\n'),
+    ('main', 1, 'Fix contract (#5)\n\n* fix\n\nCo-authored-by: X\n'),
+    ('main', 1, 'Fix contract\n\nDetails\n'),
+    ('main', 1, 'Add contract\n\nDetails\n\nMore details\n'),
+])
+def test_nonstandard_squash_commit_still_rejected(branch, parents, message):
+    assert commit_message_errors(message, branch, parents)
+
+
 @pytest.mark.parametrize('branch,parents,message', [
     ('feature/catalog-stylist', 2, 'Merge pull request #2 from KA-1205/feature/a\n\nFix'),
     ('main', 1, 'Merge pull request #2 from KA-1205/feature/a\n\nFix'),

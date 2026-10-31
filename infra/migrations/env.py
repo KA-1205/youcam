@@ -16,6 +16,11 @@ def _run_migrations(connection) -> None:
     context.configure(connection=connection, target_metadata=None)
     with context.begin_transaction():
         context.run_migrations()
+    if not context.is_offline_mode():
+        # SQLAlchemy 2.1 autobegin: alembic's logical transaction can attach to
+        # the connection's existing transaction (opened by the advisory lock),
+        # so commit explicitly or the migration DDL rolls back on close.
+        connection.commit()
 
 
 if context.is_offline_mode():
