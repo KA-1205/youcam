@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { formatMinor } from "../lib/format";
-import { sharedTransport } from "../lib/fixture/transport";
+import { sharedTransport } from "../lib/transport";
 import type { components } from "../../../../contracts/runtime/client";
 
 type OrderSnapshot = components["schemas"]["OrderSnapshot"];
@@ -27,8 +27,8 @@ export function OrderView({ order, paymentUnknown }: { order: OrderSnapshot; pay
   const version = current.orderVersion;
   const status = current.status;
 
-  function run(action: () => { data?: OrderSnapshot; error?: { error: { message: string } } }) {
-    const result = action();
+  async function run(action: () => Promise<{ data?: OrderSnapshot; error?: { error: { message: string } } }> | { data?: OrderSnapshot; error?: { error: { message: string } } }) {
+    const result = await action();
     if (result.data) setCurrent(result.data);
     else setError(result.error?.error.message ?? "That action failed.");
   }

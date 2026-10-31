@@ -1,15 +1,15 @@
 "use client";
 
 /**
- * Client session state for the styling flow. FIXTURE mode only for now:
- * the transport is the in-browser fixture, never a fake of a live API.
+ * Client session state for the styling flow. The transport is selected by
+ * NEXT_PUBLIC_TRANSPORT: the labelled in-browser fixture or the live API.
  * Optimistic version control is enforced by the transport and surfaced
  * here as a refresh conflict rather than silently overwritten.
  */
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import type { components } from "../../../../contracts/runtime/client";
 import { buildSessionCreate, type BriefFormState } from "./brief-form";
-import { sharedTransport, FixtureTransport } from "./fixture/transport";
+import { sharedTransport, type UiTransport } from "./transport";
 
 type SessionSnapshot = components["schemas"]["SessionSnapshot"];
 type ItemRef = components["schemas"]["ItemRef"];
@@ -61,11 +61,11 @@ const SessionContext = createContext<{ state: SessionState; actions: SessionActi
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
-  const transportRef = useRef<FixtureTransport | null>(null);
+  const transportRef = useRef<UiTransport | null>(null);
   const [state, setState] = useState<SessionState>(EMPTY);
 
-  // One shared fixture transport for the whole tab, so every surface sees
-  // the same sessions, jobs and orders.
+  // One shared transport for the whole tab, so every surface sees the same
+  // sessions, jobs and orders.
   const transport = useMemo(() => {
     if (!transportRef.current) transportRef.current = sharedTransport();
     return transportRef.current;
@@ -81,7 +81,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const refresh = useCallback(async () => {
     const id = window.sessionStorage.getItem(STORAGE_KEY);
     if (!id) return;
-    const { data, error } = transport.getSession(id);
+    const { data, error } = await transport.getSession(id);
     if (error || !data) {
       window.sessionStorage.removeItem(STORAGE_KEY);
       patch({ snapshot: null, looks: [], error: error?.error.message ?? "Session expired." });
@@ -94,7 +94,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const propose = useCallback(
     async (sessionId: string, expectedSessionVersion: number) => {
       patch({ busy: true, error: null });
-      const accepted = transport.createStylistJob({
+      const accepted = await transport.createStylistJob({
         mode: "PROPOSE",
         sessionId,
         expectedSessionVersion,
@@ -109,10 +109,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       patch({ jobStatus: "QUEUED" });
-      let job = transport.getStylistJob(accepted.data.jobId).data;
+      let job = (await transport.getStylistJob(accepted.data.jobId)).data;
       for (let i = 0; i < 10 && job && (job.status === "QUEUED" || job.status === "RUNNING"); i += 1) {
         await sleep(150);
-        job = transport.getStylistJob(accepted.data.jobId).data;
+        job = (await transport.getStylistJob(accepted.data.jobId)).data;
       }
       if (!job) {
         patch({ busy: false, jobStatus: "FAILED", error: "The proposal disappeared." });
@@ -150,7 +150,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         patch({ error: payload.error?.message ?? "Check the form." });
         return false;
       }
-      const { data, error } = transport.createSession(payload);
+      const { data, error } = await transport.createSession(payload);
       if (error || !data) {
         patch({ error: error?.error.message ?? "Could not start the session." });
         return false;
@@ -166,7 +166,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const restore = useCallback(async () => {
     const id = window.sessionStorage.getItem(STORAGE_KEY);
     if (id) {
-      const { data, error } = transport.getSession(id);
+      const { data, error } = await transport.getSession(id);
       if (data) {
         patch({ snapshot: data });
       } else {
@@ -216,7 +216,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       const snapshot = state.snapshot;
       if (!snapshot) return;
       patch({ busy: true });
-      const { data, error } = transport.editSession(snapshot.sessionId, {
+      const { data, error } = await transport.editSession(snapshot.sessionId, {
         expectedSessionVersion: snapshot.sessionVersion,
         anchors: edit.anchors ?? snapshot.anchors,
         brief: edit.brief ?? snapshot.brief,
@@ -248,7 +248,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const claim = useCallback(async () => {
     const snapshot = state.snapshot;
     if (!snapshot) return false;
-    const { data, error } = transport.claimSession({
+    const { data, error } = await transport.claimSession({
       expectedSessionVersion: snapshot.sessionVersion,
       keepGuestSession: true,
       sessionId: snapshot.sessionId,

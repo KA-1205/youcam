@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { sharedTransport } from "../../../lib/fixture/transport";
+import { sharedTransport } from "../../../lib/transport";
 import { OrderView } from "../../../components/order-view";
 import type { components } from "../../../../../../contracts/runtime/client";
 
@@ -18,13 +18,15 @@ export default function OrderPage() {
 
   useEffect(() => {
     if (!orderId) return;
-    const result = sharedTransport().getOrder(orderId);
-    if (result.data) {
-      setOrder(result.data);
-      setPaymentUnknown(sharedTransport().orderPaymentUnknown(orderId));
-    } else {
-      setUnknown(true);
-    }
+    void (async () => {
+      const result = await sharedTransport().getOrder(orderId);
+      if (result.data) {
+        setOrder(result.data);
+        setPaymentUnknown(sharedTransport().orderPaymentUnknown(orderId));
+      } else {
+        setUnknown(true);
+      }
+    })();
   }, [orderId]);
 
   if (unknown) {
