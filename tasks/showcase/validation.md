@@ -60,3 +60,11 @@ Seven other categories remain discoverable with pending live-verification labels
 
 CI's existing browser job will execute the expanded regression on its provisioned
 Chromium runner. No claim of a passing new remote CI run is made here.
+
+## Publication status
+
+Implementation is committed locally on integration/frontend-showcase. The HTTPS
+Git push could not authenticate. The GitHub connector's blob writes were rejected
+by automatic approval review as unreferenced external writes rather than an
+approved branch publication. No remote frontend branch or PR was created.
+Publishing requires explicit user approval for the completed branch upload.
