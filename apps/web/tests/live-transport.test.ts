@@ -187,3 +187,31 @@ test("live checkout reaches the server instead of returning a stub", async () =>
   assert.equal(result.error?.error.code, "VALIDATION_ERROR");
   assert.equal(calls[0].method, "POST");
 });
+
+test("local demo checkout uses a server-supported reference", async () => {
+  const { demoPaymentReference } = await import("../src/lib/demo-payment");
+  assert.equal(demoPaymentReference("LIVE", "demo-upi"), "demo-pay-success");
+  assert.equal(demoPaymentReference("FIXTURE", "demo-upi"), "demo-demo-upi");
+});
+
+test("confirmed live orders stay visible to this tab", async () => {
+  const { client } = fakeClient({
+    "POST /api/orders": () => ({ status: 201, payload: { orderId: "order-1" } }),
+    "GET /api/orders/{orderId}": () => ({ status: 200, payload: { orderId: "order-1" } }),
+  });
+  const transport = new LiveTransport(client);
+  await transport.confirmCheckout({} as components["schemas"]["CheckoutConfirm"], "SUCCESS");
+  const orders = await transport.listOrders();
+  assert.equal(orders.length, 1);
+  assert.equal(orders[0].orderId, "order-1");
+});
+
+test("backend disconnects surface a usable error instead of rejecting the UI action", async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = async () => { throw new TypeError("network unavailable"); };
+  try {
+    const result = await new LiveTransport().listCapabilities();
+    assert.equal(result.error?.error.code, "CONNECTION_ERROR");
+    assert.match(result.error?.error.message ?? "", /API is running/);
+  } finally { globalThis.fetch = original; }
+});

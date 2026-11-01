@@ -27,6 +27,7 @@ export default function WardrobePage() {
   const reload = useCallback(async () => {
     const page = await sharedTransport().listWardrobe();
     if (page.data) {
+      setError(null);
       // Product-only shortlist saves surface even without ownership records.
       const withSaves = new Map(page.data.items.map((i) => [`${i.reference.slot}:${i.reference.refId}`, i]));
       for (const refId of savedIds) {
@@ -47,12 +48,19 @@ export default function WardrobePage() {
       }
       setItems([...withSaves.values()]);
     }
-    setOrders(sharedTransport().listOrders());
+    if (page.error) setError(page.error.error.message);
+    setOrders(await sharedTransport().listOrders());
   }, [savedIds]);
 
   useEffect(() => {
     void reload();
   }, [reload]);
+
+  useEffect(() => {
+    if (orders.length === 0) return;
+    const interval = setInterval(() => { void reload(); }, 3000);
+    return () => clearInterval(interval);
+  }, [orders.length, reload]);
 
   async function onAddManual() {
     setError(null);
