@@ -49,7 +49,7 @@ def _item_row(row: WardrobeItem, ordered: int, owned: int) -> WardrobeItemDTO:
         wardrobeId=UUID(row.wardrobe_id),
         reference=ItemRef(slot=cast(Slot, row.slot), refType=cast(RefType, row.ref_type),
                           refId=row.ref_id),
-        saved=row.saved, orderedQuantity=ordered, ownedQuantity=owned,
+        saved=row.saved, orderedQuantity=ordered, ownedQuantity=owned + row.manual_owned_quantity,
         manualOwnedQuantity=row.manual_owned_quantity, provenance=row.provenance)
 
 
@@ -194,7 +194,7 @@ class ProfileService:
         rows = db.scalars(select(OrderLineContribution).where(
             OrderLineContribution.account_id == account_id,
             OrderLineContribution.ref_type == reference.refType,
-            OrderLineContribution.ref_id == reference.refId))
+            OrderLineContribution.ref_id == reference.refId)).all()
         ordered = sum(row.quantity for row in rows if row.state == 'ORDERED')
         owned = sum(row.quantity for row in rows if row.state == 'OWNED')
         return ordered, owned
