@@ -52,7 +52,8 @@ active. Upload/consent, payment simulation and frozen contracts remain unchanged
 - [ ] 5. Automated browser checkout smoke: blocked by unavailable Chromium.
   Cloud browser showcase checks passed; the HTTP preview origin lacks
   crypto.randomUUID for the existing fixture session flow. See validation.md.
-- [ ] 6. Push branch and open the frontend PR without merging.
+- [x] 6. Publish integration/frontend-showcase only. The user explicitly
+  requested no PR; PR creation is excluded.
 
 ## Verification commands
 

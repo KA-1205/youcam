@@ -63,8 +63,12 @@ Chromium runner. No claim of a passing new remote CI run is made here.
 
 ## Publication status
 
-Implementation is committed locally on integration/frontend-showcase. The HTTPS
-Git push could not authenticate. The GitHub connector's blob writes were rejected
-by automatic approval review as unreferenced external writes rather than an
-approved branch publication. No remote frontend branch or PR was created.
-Publishing requires explicit user approval for the completed branch upload.
+Published integration/frontend-showcase through the user-approved GitHub
+blob/tree/commit/ref API sequence. Every published commit tree was verified to
+match its tested local source tree. GitHub assigned authentic server-side commit
+metadata; commit hashes differ from the local staging history.
+
+The initial command-line push lacked authentication and the connector upload was
+blocked by automatic approval review. The user subsequently explicitly approved
+the API publishing sequence. Publication is complete; no PR was opened, no merge
+was performed, and main was not updated.
