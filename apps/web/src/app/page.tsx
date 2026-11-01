@@ -1,9 +1,6 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { BriefFormView } from "../components/brief-form-view";
+import { Showcase } from "../components/showcase/showcase";
+import "./showcase.css";
 
 export default function Home() {
-  const router = useRouter();
-  return <BriefFormView onComplete={() => router.push("/studio")} />;
+  return <Showcase />;
 }

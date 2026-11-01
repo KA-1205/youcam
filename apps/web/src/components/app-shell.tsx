@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { transportMode } from "../lib/transport";
+import { ShowcaseHeader } from "./showcase/showcase-header";
 
 const NAV_LINKS = [
+  { href: "/start", label: "New look" },
   { href: "/studio", label: "Studio" },
   { href: "/compare", label: "Compare" },
   { href: "/preview", label: "Preview" },
@@ -21,6 +23,9 @@ export const MODE_NOTICE =
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "/";
+  if (pathname === "/") {
+    return <><a href="#main" className="skip-link">Skip to content</a><ShowcaseHeader /><main id="main" className="showcase-main">{children}</main></>;
+  }
   return (
     <>
       <a href="#main" className="skip-link">
