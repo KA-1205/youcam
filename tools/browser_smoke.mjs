@@ -31,7 +31,18 @@ try {
       if (response?.ok()) break; }
     catch { await new Promise(resolve => setTimeout(resolve, 250)); }
   }
-  console.log('API_HEALTH', (await page.request.get('http://127.0.0.1:8017/healthz')).status());
+  const apiDeadline = Date.now() + 60000;
+  let apiReady = false;
+  while (Date.now() < apiDeadline) {
+    try {
+      const response = await page.request.get('http://127.0.0.1:8017/readyz', { timeout: 2000 });
+      apiReady = response.ok() && (await response.json()).ready === true;
+      if (apiReady) break;
+    } catch { /* API imports and database startup can outlast the frontend. */ }
+    await new Promise(resolve => setTimeout(resolve, 250));
+  }
+  if (!apiReady) throw new Error('API did not become ready within 60 seconds.');
+  console.log('API_READY');
   const cors = await page.request.fetch('http://127.0.0.1:8017/api/sessions', { method: 'OPTIONS', headers: { Origin: origin, 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'content-type,idempotency-key' }});
   console.log('CORS_PROBE', cors.status(), await cors.text());
   console.log('HOME', await page.title());
