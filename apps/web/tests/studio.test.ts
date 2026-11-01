@@ -35,7 +35,7 @@ function look(overrides: Partial<Look> = {}): Look {
 test("studio without a session offers the brief instead of an error", () => {
   const out = render(createElement(StudioPage));
   assert.match(out, /No active session/);
-  assert.match(out, /href="\/"/);
+  assert.match(out, /href="\/start"/);
 });
 
 test("look cards show prices, owned labels and the recalculated subtotal", () => {

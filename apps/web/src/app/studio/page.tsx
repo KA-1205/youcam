@@ -29,7 +29,7 @@ export default function StudioPage() {
         <h1>Studio</h1>
         <p className="lede">No active session on this device yet.</p>
         <p>
-          <Link href="/" className="button">
+          <Link href="/start" className="button">
             Start from a brief
           </Link>
         </p>

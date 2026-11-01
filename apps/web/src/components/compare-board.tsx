@@ -22,7 +22,7 @@ export function CompareBoard({ looks }: { looks: Look[] }) {
         <h2>No looks yet</h2>
         <p>Generate looks from a brief first — this board compares what the studio produced.</p>
         <p>
-          <Link href="/" className="button">
+          <Link href="/start" className="button">
             Start from a brief
           </Link>
         </p>

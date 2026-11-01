@@ -14,7 +14,7 @@
     "lint": "eslint apps/web/src apps/web/tests contracts/runtime/client.ts",
     "test": "node --import tsx --test apps/web/tests/*.test.ts",
     "contracts:generate": "openapi-typescript contracts/runtime/openapi.json -o contracts/runtime/client.ts",
-    "dev": "npm run dev --workspace @anchor-fit/web",
+    "dev": "node tools/web-dev.mjs",
     "test:browser": "node tools/browser_smoke.mjs"
   },
   "devDependencies": {

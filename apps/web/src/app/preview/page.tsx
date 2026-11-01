@@ -182,7 +182,7 @@ export default function PreviewPage() {
     } finally { setBusy(false); }
   }
 
-  if (!state.snapshot) return <><h1>Preview</h1><p className="lede">Previews run against a session. Start one first.</p><Link className="button" href="/">Start from a brief</Link>{error && <p role="alert">{error}</p>}</>;
+  if (!state.snapshot) return <><h1>Preview</h1><p className="lede">Previews run against a session. Start one first.</p><Link className="button" href="/start">Start from a brief</Link>{error && <p role="alert">{error}</p>}</>;
 
   return <>
     <h1>Preview on you</h1>

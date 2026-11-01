@@ -50,6 +50,7 @@ try {
   if (!['live', 'commerce'].includes(process.env.ANCHOR_BROWSER_RUN)) {
     console.log('TEXT', (await page.locator('main').innerText()).slice(-2200));
   } else {
+    await page.getByRole('link', { name: 'Build my look', exact: true }).first().click();
     await page.getByRole('button', { name: 'Generate looks' }).click();
     await page.waitForURL('**/studio', { timeout: 30000 });
     console.log('SESSION_CREATED');

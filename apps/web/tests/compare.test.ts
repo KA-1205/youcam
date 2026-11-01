@@ -59,5 +59,5 @@ test("compare board offers per-item save controls", () => {
 test("compare board explains an empty state honestly", () => {
   const out = withProviders(createElement(CompareBoard, { looks: [] }));
   assert.match(out, /no looks yet/i);
-  assert.match(out, /href="\/"/);
+  assert.match(out, /href="\/start"/);
 });

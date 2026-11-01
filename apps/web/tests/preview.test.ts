@@ -13,5 +13,5 @@ function render(node: React.ReactElement): string {
 test("preview page without a session directs to the brief", () => {
   const out = render(createElement(PreviewPage));
   assert.match(out, /Previews run against a session/);
-  assert.match(out, /href="\/"\\?>/);
+  assert.match(out, /href="\/start"\\?>/);
 });

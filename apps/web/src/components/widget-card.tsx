@@ -36,7 +36,7 @@ export function WidgetCard() {
         Scoped, short-lived launch context. This widget forwards the exact authorized variant only;
         no shopper photo consent carries over from the partner site.
       </p>
-      <Link className="button" href="/">
+      <Link className="button" href="/start">
         Continue in Anchor Fit
       </Link>
     </section>
