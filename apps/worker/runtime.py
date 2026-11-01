@@ -70,6 +70,9 @@ class Runtime:
             if outcome is None:
                 break
             summary[outcome] += 1
+        if self.preview._live is not None:
+            with self.database.unit_of_work() as db:
+                summary['providerDeletions'] = self.preview._live.sweep_deletions(db)
         return summary
 
     def _run_one(self) -> str | None:
@@ -81,7 +84,16 @@ class Runtime:
             row = db.get(DurableTaskRow, str(task.taskId))
             assert row is not None
             try:
-                self._dispatch(db, row.operation, row.resource_id, row.context_json)
+                if row.operation == 'PREVIEW':
+                    outcome = self.preview.run(db, UUID(row.resource_id))
+                    if outcome == 'RUNNING':
+                        row.status = 'WAITING'
+                        row.available_at = _now() + timedelta(seconds=10)
+                        row.lease_worker_id = None
+                        row.lease_expires_at = None
+                        return 'retried'
+                else:
+                    self._dispatch(db, row.operation, row.resource_id, row.context_json)
                 self.tasks.complete(db, task.taskId, _now())
                 return 'succeeded'
             except ApiError as error:
@@ -212,7 +224,7 @@ def build_runtime(database: Database, client_factory=None) -> Runtime:
     preview = PreviewService(sessions.assert_editable, catalog,
                              lambda db, actor: profile.consent_snapshot(db, actor),
                              storage.store_render_result, tasks, storage.asset_available,
-                             client_factory=client_factory)
+                             client_factory=client_factory, read_asset=storage.read_content)
     return Runtime(database=database, catalog=catalog, access=AccessService(), profile=profile,
                    sessions=sessions, tasks=tasks, payment=payment, commerce=commerce,
                    storage=storage, storage_backend=storage_backend, preview=preview,

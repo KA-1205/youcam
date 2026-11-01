@@ -106,14 +106,19 @@ class PreviewService:
     def __init__(self, session_guard: Callable, catalog, consent_lookup: Callable[..., object],
                  store_result: Callable[..., str], tasks: TaskService, asset_check: Callable,
                  client_factory: Callable[[str], ProviderClient] | None = None,
-                 mode: str = 'FIXTURE') -> None:
+                 mode: str = 'FIXTURE', read_asset: Callable | None = None) -> None:
         self._session_guard = session_guard
         self._catalog = catalog
         self._consent_lookup = consent_lookup
         self._store_result = store_result
         self._asset_check = asset_check
         self._tasks = tasks
-        self._mode = mode
+        from apps.api.modules.try_on_jobs.live_gateway import enabled_capabilities
+        from apps.api.modules.try_on_jobs.live_runner import LiveRunner
+
+        self._enabled_live = enabled_capabilities()
+        self._mode = 'LIVE' if self._enabled_live else mode
+        self._live = LiveRunner(read_asset, store_result) if read_asset and self._enabled_live else None
         self._client_factory = client_factory or self._fixture_client
 
     # Enqueue (HTTP side) ----------------------------------------------------
@@ -140,6 +145,10 @@ class PreviewService:
             if missing:
                 raise ApiError(422, 'VALIDATION_ERROR',
                                f'Unknown catalog references: {", ".join(missing)}.')
+        if self._mode == 'LIVE' and request.capability not in self._enabled_live:
+            raise ApiError(503, 'PROVIDER_UNAVAILABLE', 'This preview capability is not activated.')
+        if self._mode == 'LIVE' and 'youcam' not in consent_snapshot.processors:
+            raise ApiError(403, CONSENT_REQUIRED, 'Consent to the YouCam processor is required.')
         plan_chain(request)  # validates supported areas before any durable write
         self._check_quota(db, ctx.actorId, request)
         now = clock.now()
@@ -154,7 +163,10 @@ class PreviewService:
                              selections=[item.model_dump() for item in request.selections],
                              effect_ids=list(request.effectIds), settings=dict(request.settings),
                              error_json=None, created_at=now, updated_at=now))
-        for sequence, (capability, items) in enumerate(plan_chain(request)):
+        planned = plan_chain(request)
+        if self._mode == 'LIVE' and request.capability == 'CLOTHES_V4':
+            planned = [(cap, [item]) for cap, items in planned for item in items]
+        for sequence, (capability, items) in enumerate(planned):
             db.add(ChildTaskRow(child_task_id=str(uuid4()), job_id=job_id, sequence=sequence,
                                 capability=capability, status='CREATED',
                                 source_asset_id=str(request.sourceAssetId),
@@ -221,13 +233,18 @@ class PreviewService:
         row = self._owned_job(db, ctx, job_id)
         children = db.scalars(select(ChildTaskRow).where(ChildTaskRow.job_id == str(job_id))
                               .order_by(ChildTaskRow.sequence)).all()
+        try:
+            self._session_guard(db, ctx, UUID(row.session_id), row.session_version)
+        except ApiError:
+            row.freshness = 'SUPERSEDED'
         return PreviewJob(
             jobId=UUID(row.job_id), sessionId=UUID(row.session_id),
             sessionVersion=row.session_version, consentRevision=row.consent_revision,
             status=cast(JobStatus, row.status), freshness=cast(
                 Literal['CURRENT', 'SUPERSEDED'], row.freshness),
             executionMode=cast(Literal['FIXTURE', 'LIVE'], row.execution_mode),
-            children=[child_dto(child) for child in children],
+            children=[child_dto(child).model_copy(update={'resultAssetId': None})
+                      if row.freshness != 'CURRENT' else child_dto(child) for child in children],
             error=_error_detail(row.error_json) if row.error_json else None,
             createdAt=row.created_at, updatedAt=row.updated_at)
 
@@ -293,16 +310,37 @@ class PreviewService:
             outcome = self._run_child(db, job, child)
             if outcome != 'SUCCEEDED':
                 break  # stop the chain while retaining valid independent previews
+        if outcome == 'RUNNING':
+            db.flush()
+            return 'RUNNING'
         if outcome == 'SUCCEEDED':
             job.status = 'SUCCEEDED'
         elif job.status == 'RUNNING':
             job.status = 'FAILED'
+        marker = db.get(ActiveJobMarker, job.actor_id)
+        if marker is not None and marker.job_id == job.job_id:
+            db.delete(marker)
         job.updated_at = clock.now()
         db.flush()
         return outcome
 
     def _run_child(self, db: Session, job: PreviewJobRow, child: ChildTaskRow) -> str:
         capability = child.capability
+        if job.execution_mode == 'LIVE':
+            if self._live is None:
+                raise ApiError(503, 'PROVIDER_UNAVAILABLE', 'Private storage is not connected.')
+            def revalidate():
+                db.refresh(job)
+                consent = cast(ConsentSnapshot, self._consent_lookup(db, job.actor_id))
+                if (job.status not in ACTIVE_STATUSES or not consent.controls.processPhotos
+                        or consent.consentRevision != job.consent_revision
+                        or 'youcam' not in consent.processors):
+                    raise ApiError(403, CONSENT_REQUIRED, 'Preview authorization changed.')
+                self._session_guard(db, _job_ctx(job), UUID(job.session_id), job.session_version)
+            try:
+                return self._live.run(db, job, child, _job_ctx(job), revalidate)
+            except ApiError as exc:
+                return self._terminate(db, job, 'FAILED', exc.code, exc.message)
         child.status = 'SUBMITTED'
         child.attempt += 1
         child.updated_at = clock.now()

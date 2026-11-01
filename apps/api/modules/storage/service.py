@@ -165,7 +165,7 @@ class StorageService:
         self._backend.put(storage_key, data)
         now = clock.now()
         db.add(AssetRow(asset_id=asset_id, tenant_id=tenant_id, actor_id=actor_id,
-                        account_id=None, capability=capability, content_type='image/png',
+                        account_id=None, capability=capability, content_type='image/jpeg' if data.startswith(b'\xff\xd8\xff') else 'image/png',
                         byte_length=len(data), digest=hashlib.sha256(data).hexdigest(),
                         storage_key=storage_key, status='AVAILABLE', saved=False,
                         last_saved_at=None, expires_at=now + UNSAVED_TTL, deleted_at=None,

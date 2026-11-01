@@ -89,7 +89,8 @@ def create_app(database_url: str | None = None) -> FastAPI:
     preview_service = PreviewService(session_service.assert_editable, catalog,
                                      profile_service.consent_snapshot,
                                      storage_service.store_render_result, task_service,
-                                     storage_service.asset_available)
+                                     storage_service.asset_available,
+                                     read_asset=storage_service.read_content)
     broker = build_broker()
 
     def actor_account(actor_id: str) -> str | None:
@@ -678,7 +679,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
             with database.unit_of_work() as db:
                 revision = db.execute(sqlalchemy.text(
                     'SELECT version_num FROM alembic_version')).scalar_one()
-                connected = revision == '0008_provider_activations'
+                connected = revision == '0009_live_delivery'
         except Exception:
             connected = False
         return {'ready': connected, 'database': connected, 'liveProvidersEnabled': False}
@@ -752,7 +753,5 @@ def create_app(database_url: str | None = None) -> FastAPI:
     return app
 
 
-if os.getenv('LIVE_PROVIDERS_ENABLED', 'false').lower() != 'false':
-    raise RuntimeError('Live providers cannot be enabled without verified activation evidence.')
 
 app = create_app()
