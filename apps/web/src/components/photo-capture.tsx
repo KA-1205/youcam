@@ -14,7 +14,7 @@ const VALIDATION_COPY: Record<string, string> = {
  * Nothing is transmitted here: upload wiring arrives with the preview
  * workspace, and this component never implies a provider call happened.
  */
-export function PhotoCapture({ capability }: { capability: string }) {
+export function PhotoCapture({ capability, onFile }: { capability: string; onFile?: (file: File | null) => void }) {
   const adultId = useId();
   const consentId = useId();
   const inputId = useId();
@@ -34,15 +34,18 @@ export function PhotoCapture({ capability }: { capability: string }) {
     if (!result.ok) {
       setError(VALIDATION_COPY[result.code] ?? "That photo cannot be used. Choose another.");
       setPhotoName(null);
+      onFile?.(null);
       event.target.value = "";
       return;
     }
     setError(null);
     setPhotoName(file.name);
+    onFile?.(file);
   }
 
   function onClear() {
     setPhotoName(null);
+    onFile?.(null);
     setError(null);
     if (inputRef.current) inputRef.current.value = "";
   }
@@ -57,7 +60,7 @@ export function PhotoCapture({ capability }: { capability: string }) {
       </ul>
       <p className="footnote">
         Your photo is never sent anywhere from this screen. Upload to the private preview service is
-        a separate, explicit step that does not exist yet.
+        a separate, explicit step.
       </p>
       <div className="field">
         <span>

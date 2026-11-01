@@ -38,13 +38,16 @@ class ProviderActivationRow(ActivationBase):
 
 
 def capability_page(db: Session | None = None) -> CapabilityPage:
+    from apps.api.modules.try_on_jobs.live_gateway import enabled_capabilities
+
+    configured = enabled_capabilities()
     verified: set[str] = set()
     if db is not None:
         verified = {row.capability for row in db.scalars(select(ProviderActivationRow))}
     return CapabilityPage(items=[
         CapabilityState(capability=capability,
                         state='VERIFIED' if capability in verified else 'NOT_TESTED',
-                        liveEnabled=False,  # credentials and cost guards stay unverified here
+                        liveEnabled=capability in configured,
                         evidenceId=capability if capability in verified else None)
         for capability in CAPABILITY_IDS])
 

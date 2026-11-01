@@ -85,6 +85,26 @@ function notImplemented<T>(message: string): FixtureResult<T> {
 
 export class LiveTransport {
   private client: ApiClient;
+
+  async demoSignIn(): Promise<void> {
+    const saved = window.sessionStorage.getItem("anchor-fit.demo-email");
+    const email = saved ?? `local-${crypto.randomUUID()}@demo.invalid`;
+    window.sessionStorage.setItem("anchor-fit.demo-email", email);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000"}/api/auth/demo-login`, {
+      method: "POST", credentials: "include", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    if (!response.ok) throw new Error("Demo login is unavailable on this server.");
+  }
+
+  async uploadFile(assetId: string, file: File): Promise<FixtureResult<AssetDescriptor>> {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000"}/api/assets/${assetId}/content`, {
+      method: "PUT", credentials: "include", headers: { "Content-Type": file.type }, body: file,
+    });
+    const payload = await response.json();
+    return response.ok ? { data: payload } : { error: payload };
+  }
+
   private claimedSessions = new Set<string>();
   private shares = new Map<string, ShareSnapshot>();
   private orders = new Map<string, OrderSnapshot>();
@@ -95,7 +115,20 @@ export class LiveTransport {
       createClient<paths>({
         baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000",
         credentials: "include",
+        fetch: async (input: Request) => {
+          try { return await fetch(input); }
+          catch {
+            return new Response(JSON.stringify({ error: { code: "CONNECTION_ERROR",
+              message: "Cannot reach the backend. Check that the API is running." },
+              requestId: crypto.randomUUID() }), { status: 503,
+              headers: { "Content-Type": "application/json" } });
+          }
+        },
       });
+  }
+
+  async getProfile(): Promise<FixtureResult<components["schemas"]["ProfileSnapshot"]>> {
+    return toResult(await this.client.GET("/api/profile"));
   }
 
   // -- sessions ---------------------------------------------------------------
@@ -188,8 +221,12 @@ export class LiveTransport {
     // Live mode uploads bytes to the signed access path during real capture;
     // the fixture's upload-completion shortcut has no server equivalent.
     return notImplemented(
-      "Live photo capture is not wired in this integration pass; uploads stay in fixture mode.",
+      "Upload completion requires actual photo bytes; use the private photo upload flow.",
     );
+  }
+
+  async deleteAsset(assetId: string): Promise<FixtureResult<Ack>> {
+    return toResult(await this.client.DELETE("/api/assets/{assetId}", { params: { path: { assetId } } }));
   }
 
   async getAsset(assetId: string): Promise<FixtureResult<AssetDescriptor>> {
@@ -229,19 +266,19 @@ export class LiveTransport {
   }
 
   async confirmCheckout(_body: CheckoutConfirm, _scripted: DemoOutcome): Promise<FixtureResult<OrderSnapshot>> {
-    // The scripted outcome is a fixture-only affordance; the server's labelled
-    // demo payment port decides the outcome for real calls.
     void _scripted;
-    return notImplemented(
-      "Checkout requires a verified session on the server; use the fixture transport for scripted demo checkouts.",
-    );
+    const result = toResult(await this.client.POST("/api/orders", {
+      body: _body, params: { header: idempotencyHeaders() },
+    }));
+    if (result.data) this.rememberOrder(result.data);
+    return result;
   }
 
   async getOrder(orderId: string): Promise<FixtureResult<OrderSnapshot>> {
     const result = toResult(
       await this.client.GET("/api/orders/{orderId}", { params: { path: { orderId } } }),
     );
-    if (result.data) this.orders.set(orderId, result.data);
+    if (result.data) this.rememberOrder(result.data);
     return result;
   }
 
@@ -297,7 +334,28 @@ export class LiveTransport {
   }
 
   /** Orders this tab created or fetched; the frozen contract has no order list route. */
-  listOrders(): OrderSnapshot[] {
+  private rememberOrder(order: OrderSnapshot): void {
+    this.orders.set(order.orderId, order);
+    if (typeof window !== "undefined") {
+      let saved: unknown = [];
+      try { saved = JSON.parse(window.sessionStorage.getItem("anchor-fit.order-ids") ?? "[]"); } catch { /* discard corrupt local metadata */ }
+      const known = Array.isArray(saved) ? saved.filter((id): id is string => typeof id === "string") : [];
+      window.sessionStorage.setItem("anchor-fit.order-ids", JSON.stringify([...new Set([...known, ...this.orders.keys()])].slice(-100)));
+    }
+  }
+
+  async listOrders(): Promise<OrderSnapshot[]> {
+    const ids = new Set(this.orders.keys());
+    if (typeof window !== "undefined") {
+      try {
+        const saved: unknown = JSON.parse(window.sessionStorage.getItem("anchor-fit.order-ids") ?? "[]");
+        if (Array.isArray(saved)) for (const id of saved.slice(-100)) if (typeof id === "string") ids.add(id);
+      } catch { window.sessionStorage.removeItem("anchor-fit.order-ids"); }
+    }
+    for (const id of ids) {
+      const fetched = await this.getOrder(id);
+      if (!fetched.data) this.orders.delete(id);
+    }
     return [...this.orders.values()];
   }
 

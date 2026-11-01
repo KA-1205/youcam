@@ -24,9 +24,11 @@ dependencies = [
     { name = "alembic" },
     { name = "boto3" },
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "jsonschema" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydantic" },
+    { name = "python-dotenv" },
     { name = "sqlalchemy" },
     { name = "uvicorn" },
 ]
@@ -47,9 +49,11 @@ requires-dist = [
     { name = "alembic", specifier = "==1.20.1" },
     { name = "boto3", specifier = "==1.43.122" },
     { name = "fastapi", specifier = "==0.162.0" },
+    { name = "httpx", specifier = "==0.28.1" },
     { name = "jsonschema", specifier = "==4.26.0" },
     { name = "psycopg", extras = ["binary"], specifier = "==3.3.6" },
     { name = "pydantic", specifier = "==2.14.2" },
+    { name = "python-dotenv", specifier = "==1.2.4" },
     { name = "sqlalchemy", specifier = "==2.1.6" },
     { name = "uvicorn", specifier = "==0.54.0" },
 ]

@@ -4,6 +4,7 @@
  */
 "use client";
 
+import { transportMode } from "../lib/transport";
 import { useState } from "react";
 import { VARIANTS } from "../lib/fixture/demo-catalog";
 import { formatMinor } from "../lib/format";
@@ -93,8 +94,7 @@ export function BriefFormView({ onComplete }: { onComplete: () => void }) {
         authorized catalog — then checks budget, locks and preferences before anything is suggested.
       </p>
       <p className="mode-note" role="status">
-        FIXTURE MODE — this storefront runs on labelled sample data. Live styling, photo previews
-        and payment are not available yet.
+        {transportMode() === "LIVE" ? "Backend connected — sample catalog and demo checkout. Open Preview for configured photo capabilities." : "FIXTURE MODE — this storefront runs on labelled sample data. Live styling, photo previews and payment are not available yet."}
       </p>
 
       <section className="card" aria-label="Brief">

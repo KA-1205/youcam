@@ -59,6 +59,34 @@ class StorageService:
         db.flush()
         return self._descriptor(db, asset_id, issue_access=False)
 
+    def upload_content(self, db: Session, ctx: AccessContext, asset_id: str,
+                       data: bytes, content_type: str) -> AssetDescriptor:
+        self._require_consent(db, ctx.actorId, 'processPhotos')
+        row = self._owned_asset(db, ctx, asset_id, include_terminal=False)
+        if clock.as_utc(row.expires_at) <= clock.now():
+            raise ApiError(410, 'HTTP_ERROR', 'Upload expired.')
+        if not data or len(data) > MAX_BYTES or len(data) != row.byte_length:
+            raise ApiError(422, 'VALIDATION_ERROR', 'Photo size does not match the upload.')
+        signatures = {
+            'image/jpeg': data.startswith(b'\xff\xd8\xff'),
+            'image/png': data.startswith(b'\x89PNG\r\n\x1a\n'),
+            'image/webp': data.startswith(b'RIFF') and data[8:12] == b'WEBP',
+        }
+        if content_type != row.content_type or not signatures.get(content_type):
+            raise ApiError(422, 'VALIDATION_ERROR', 'Photo format does not match its content.')
+        self.complete_upload(db, asset_id, data)
+        return self.get_asset(db, ctx, asset_id)
+
+    def read_content(self, db: Session, ctx: AccessContext, asset_id: str) -> tuple[bytes, str]:
+        self._require_consent(db, ctx.actorId, 'processPhotos')
+        row = self._owned_asset(db, ctx, asset_id, include_terminal=False)
+        if row.status != 'AVAILABLE' or clock.as_utc(row.expires_at) <= clock.now():
+            raise ApiError(410, 'HTTP_ERROR', 'Photo is unavailable.')
+        data = self._backend.get(row.storage_key)
+        if data is None:
+            raise ApiError(404, 'NOT_FOUND', 'Photo is unavailable.')
+        return data, row.content_type
+
     def complete_upload(self, db: Session, asset_id: str, data: bytes) -> None:
         """Fixture-mode upload completion; live transfers go directly to the backend."""
         row = db.get(AssetRow, asset_id)
@@ -137,7 +165,7 @@ class StorageService:
         self._backend.put(storage_key, data)
         now = clock.now()
         db.add(AssetRow(asset_id=asset_id, tenant_id=tenant_id, actor_id=actor_id,
-                        account_id=None, capability=capability, content_type='image/png',
+                        account_id=None, capability=capability, content_type='image/jpeg' if data.startswith(b'\xff\xd8\xff') else 'image/png',
                         byte_length=len(data), digest=hashlib.sha256(data).hexdigest(),
                         storage_key=storage_key, status='AVAILABLE', saved=False,
                         last_saved_at=None, expires_at=now + UNSAVED_TTL, deleted_at=None,

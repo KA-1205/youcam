@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { transportMode } from "../lib/transport";
 
 const NAV_LINKS = [
   { href: "/studio", label: "Studio" },
@@ -47,7 +48,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
         <p className="mode-banner" role="note">
-          {MODE_NOTICE}
+          {transportMode() === "LIVE" ? "Backend connected · sample catalog · demo commerce · preview readiness shown per category" : MODE_NOTICE}
         </p>
       </header>
       <main id="main" className="site-main">
@@ -55,7 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </main>
       <footer className="site-footer">
         <p>
-          Anchor Fit — simulated store. Demo data only; no real payments, no live provider calls.
+          Anchor Fit — simulated store. No real payments. Photo processing is separately consented.
         </p>
       </footer>
     </>

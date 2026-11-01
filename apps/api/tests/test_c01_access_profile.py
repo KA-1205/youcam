@@ -101,6 +101,7 @@ def test_wardrobe_save_and_list_with_provenance(client):
     item = saved.json()
     assert item['reference']['refId'] == 'var-1'
     assert item['manualOwnedQuantity'] == 2
+    assert item['ownedQuantity'] == 2
     assert item['provenance'] == ['MANUAL']
 
     listed = client.get('/api/wardrobe')
@@ -112,6 +113,7 @@ def test_wardrobe_save_and_list_with_provenance(client):
         'saved': True, 'manualOwnedQuantity': 0, 'attributesConfirmed': True})
     assert resave.status_code == 201
     assert resave.json()['manualOwnedQuantity'] == 0
+    assert resave.json()['ownedQuantity'] == 0
     listed = client.get('/api/wardrobe')
     assert [entry['reference']['refId'] for entry in listed.json()['items']] == ['var-1']
 
@@ -146,3 +148,28 @@ def test_other_account_cannot_read_profile(client, db_url):
 def test_consent_contract_validation(client, body):
     client.post('/api/auth/demo-login', json={'email': 'shape@example.com'})
     assert client.put('/api/consents', json=body).status_code == 422
+
+
+def test_manual_ownership_adds_to_delivered_contributions(client, db_url):
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import Session
+
+    from apps.api import clock
+    from apps.api.modules.shopper_profile.models import OrderLineContribution
+
+    account = client.post('/api/auth/demo-login', json={'email': 'totals@example.com'}).json()
+    with Session(create_engine(db_url)) as db:
+        for state, quantity in [('ORDERED', 3), ('OWNED', 4)]:
+            db.add(OrderLineContribution(order_line_id=state, account_id=account['accountId'],
+                order_id=state, ref_type='VARIANT', ref_id='var-1', slot='TOP',
+                quantity=quantity, state=state, updated_at=clock.now()))
+        db.commit()
+    saved = client.post('/api/wardrobe', json={
+        'reference': {'slot': 'TOP', 'refType': 'VARIANT', 'refId': 'var-1'},
+        'saved': True, 'manualOwnedQuantity': 2, 'attributesConfirmed': True})
+    assert saved.status_code == 201
+    assert saved.json()['orderedQuantity'] == 3
+    assert saved.json()['ownedQuantity'] == 6
+    listed = client.get('/api/wardrobe').json()['items'][0]
+    assert listed['ownedQuantity'] == 6
+    assert listed['manualOwnedQuantity'] == 2

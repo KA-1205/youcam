@@ -82,7 +82,8 @@ class ProviderClient:
             if not api_key or not base_url:
                 raise ApiError(503, 'PROVIDER_UNAVAILABLE',
                                'Live provider access is not activated for this capability.')
-            self._http = httpx.Client(base_url=base_url, headers={'X-API-KEY': api_key},
+            self._http = httpx.Client(base_url=base_url, headers={'Authorization': f'Bearer {api_key}'},
+                                      transport=transport,
                                       timeout=20.0)
         else:
             self._http = httpx.Client(

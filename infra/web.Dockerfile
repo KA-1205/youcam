@@ -5,6 +5,10 @@ COPY apps/web/package.json apps/web/package.json
 RUN npm install --global npm@11.9.0 --ignore-scripts && npm ci --ignore-scripts
 COPY apps/web apps/web
 COPY contracts/runtime/client.ts contracts/runtime/client.ts
+ARG NEXT_PUBLIC_TRANSPORT=live
+ARG NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
+ENV NEXT_PUBLIC_TRANSPORT=$NEXT_PUBLIC_TRANSPORT
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 RUN npm run build
 FROM node:24-alpine
 WORKDIR /app

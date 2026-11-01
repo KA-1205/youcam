@@ -4,6 +4,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { demoPaymentReference } from "../lib/demo-payment";
 import { findVariant } from "../lib/fixture/demo-catalog";
 import { formatMinor } from "../lib/format";
 import { sharedTransport, transportMode } from "../lib/transport";
@@ -43,7 +44,7 @@ export function CheckoutView({ onOrderPlaced }: { onOrderPlaced: (orderId: strin
     .map((ref) => ({ quantity: 1, variantId: ref.refId }));
 
   useEffect(() => {
-    if (!snapshot || lines.length === 0) return;
+    if (!snapshot || !claimed || lines.length === 0) return;
     void (async () => {
       const result = await sharedTransport().quoteCart({
         expectedSessionVersion: snapshot.sessionVersion,
@@ -81,7 +82,7 @@ export function CheckoutView({ onOrderPlaced }: { onOrderPlaced: (orderId: strin
         confirmedTotalMinor: quote.totalMinor,
         expectedQuoteVersion: quote.quoteVersion,
         expectedSessionVersion: snapshot.sessionVersion,
-        paymentReference: `demo-${method}`,
+        paymentReference: demoPaymentReference(transportMode(), method),
         quoteId: quote.quoteId,
       },
       outcome,

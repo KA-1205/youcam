@@ -34,7 +34,8 @@ class UtilityClient:
             if not api_key or not base_url:
                 raise ApiError(503, 'PROVIDER_UNAVAILABLE',
                                'Utility operations are not activated for this account.')
-            self._http = httpx.Client(base_url=base_url, headers={'X-API-KEY': api_key},
+            self._http = httpx.Client(base_url=base_url, headers={'Authorization': f'Bearer {api_key}'},
+                                      transport=transport,
                                       timeout=20.0)
         else:
             self._http = httpx.Client(
@@ -86,7 +87,7 @@ class UtilityClient:
         if self.mode == 'LIVE' and not self.history_key:
             raise ApiError(503, 'PROVIDER_UNAVAILABLE',
                            'Credit history requires its own documented credential.')
-        headers = {'X-API-KEY': self.history_key or 'fixture-history-key'}
+        headers = {'Authorization': f'Bearer {self.history_key or self.api_key or "fixture-history-key"}'}
         try:
             response = self._http.get(HISTORY_PATH, headers=headers)
         except httpx.HTTPError:

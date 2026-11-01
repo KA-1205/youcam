@@ -8,6 +8,7 @@
  */
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import type { components } from "../../../../contracts/runtime/client";
+import { LiveTransport } from "./live/transport";
 import { buildSessionCreate, type BriefFormState } from "./brief-form";
 import { sharedTransport, type UiTransport } from "./transport";
 
@@ -248,6 +249,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const claim = useCallback(async () => {
     const snapshot = state.snapshot;
     if (!snapshot) return false;
+    if (transport instanceof LiveTransport) await transport.demoSignIn();
     const { data, error } = await transport.claimSession({
       expectedSessionVersion: snapshot.sessionVersion,
       keepGuestSession: true,

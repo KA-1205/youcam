@@ -55,11 +55,15 @@ def test_cost_fetch_balance_and_history_with_distinct_auth():
     assert entries == [{'taskId': 't', 'units': 2}]
     history_request = [request for request in requests
                        if request.url.path == '/s2s/v1.0/client/credit/history'][0]
-    assert history_request.headers['x-api-key'] == 'fixture-history-key'
+    assert history_request.headers['authorization'] == 'Bearer fixture-history-key'
 
 
 def test_credit_history_requires_its_own_credential_in_live_mode():
-    client = UtilityClient(mode='LIVE', base_url='https://x.invalid', api_key='k')
+    def unexpected_request(request):
+        pytest.fail('Missing history credentials must fail before any HTTP request.')
+
+    client = UtilityClient(mode='LIVE', base_url='https://x.invalid', api_key='k',
+                           transport=httpx.MockTransport(unexpected_request))
     with pytest.raises(ApiError) as error:
         client.credit_history()
     assert error.value.code == 'PROVIDER_UNAVAILABLE'

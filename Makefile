@@ -1,4 +1,4 @@
-.PHONY: install check test api mock worker web build contracts
+.PHONY: install check test api mock worker web build contracts dev
 install:
 	uv sync --frozen
 	npm ci
@@ -20,10 +20,13 @@ build:
 	npm run build
 	uv run python -m compileall -q apps/api apps/worker services contracts
 api:
-	uv run uvicorn apps.api.main:app --host 127.0.0.1 --port 8000
+	uv run python -m tools.local api
 mock:
 	uv run uvicorn contracts.runtime.mock:app --host 127.0.0.1 --port 8001
 worker:
-	uv run python -m apps.worker.main --check
+	uv run python -m tools.local worker
 web:
-	npm run dev
+	uv run python -m tools.local web
+
+dev:
+	uv run python -m tools.local dev

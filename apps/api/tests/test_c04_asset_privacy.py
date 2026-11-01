@@ -182,3 +182,29 @@ def test_worker_purges_asset_delete_tasks(client, db_url):
     assert summary['succeeded'] >= 1
     fetched = client.get(f"/api/assets/{descriptor['assetId']}").json()
     assert fetched['status'] == 'REVOKED'
+
+
+def test_local_http_identity_survives_reload(db_url, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from apps.api.main import create_app
+    monkeypatch.setenv('DEMO_MODE', 'true')
+    with TestClient(create_app(db_url), base_url='http://127.0.0.1') as browser:
+        first = browser.get('/api/profile').json()
+        second = browser.get('/api/profile').json()
+        assert first['actorId'] == second['actorId']
+
+
+def test_photo_bytes_round_trip_and_revocation(client):
+    prepare_consent(client)
+    descriptor = prepare_asset(client)
+    path = f"/api/assets/{descriptor['assetId']}/content"
+    photo = b'\xff\xd8\xff' + b'x' * 2045
+    invalid = client.put(path, content=b'bad', headers={'Content-Type': 'image/jpeg'})
+    assert invalid.status_code == 422
+    uploaded = client.put(path, content=photo, headers={'Content-Type': 'image/jpeg'})
+    assert uploaded.status_code == 200
+    assert uploaded.json()['status'] == 'AVAILABLE'
+    assert client.get(path).content == photo
+    client.delete(f"/api/assets/{descriptor['assetId']}")
+    assert client.get(path).status_code == 410
