@@ -59,7 +59,11 @@ def test_cost_fetch_balance_and_history_with_distinct_auth():
 
 
 def test_credit_history_requires_its_own_credential_in_live_mode():
-    client = UtilityClient(mode='LIVE', base_url='https://x.invalid', api_key='k')
+    def unexpected_request(request):
+        pytest.fail('Missing history credentials must fail before any HTTP request.')
+
+    client = UtilityClient(mode='LIVE', base_url='https://x.invalid', api_key='k',
+                           transport=httpx.MockTransport(unexpected_request))
     with pytest.raises(ApiError) as error:
         client.credit_history()
     assert error.value.code == 'PROVIDER_UNAVAILABLE'
