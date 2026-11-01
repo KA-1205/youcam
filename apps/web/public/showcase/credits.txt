@@ -1,0 +1,32 @@
+ANCHOR FIT — SHOWCASE ASSETS
+
+Editorial stock imagery is styling inspiration. It is not catalog imagery,
+an endorsement, an AI recommendation or a YouCam-generated result.
+
+Fashion portrait: Alina Matveycheva / Unsplash
+https://unsplash.com/photos/hnAWDdHSgSI
+https://images.unsplash.com/photo-1747814965209-2301e535f209
+
+Beauty portrait: Kateryna Hliznitsova / Unsplash
+https://unsplash.com/photos/nBfrI_j8uzA
+https://images.unsplash.com/photo-1716913888282-c66f67e01efb
+
+Gold earrings: JESSIE ABRAHAM / Unsplash
+https://unsplash.com/photos/MGlSslCP2LY
+https://images.unsplash.com/photo-1771173652661-8245a9d94095
+
+All three source pages identify these images as free under the Unsplash License.
+https://unsplash.com/license
+Local copies resized through Unsplash image delivery; retrieved November 1, 2026.
+
+Garment sketches and the Anchor Fit mark: original inline vector artwork.
+
+Fonts: Bricolage Grotesque and Urbanist, SIL Open Font License 1.1.
+Unmodified font files from Google Fonts. Full licenses are bundled beside them:
+/showcase/fonts/Bricolage-OFL.txt
+/showcase/fonts/Urbanist-OFL.txt
+
+Design references (structure and presentation only; no copied brand assets):
+https://snap2shelf.vercel.app/
+https://www.cos.com/en-in/women
+https://www.perfectcorp.com/business/products/ai-fashion-tryon/
