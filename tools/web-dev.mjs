@@ -10,8 +10,10 @@ const option = (name, fallback) => {
 const host = option('--host', option('--hostname', '127.0.0.1'));
 const port = option('--port', process.env.PORT ?? '3000');
 const root = fileURLToPath(new URL('../', import.meta.url));
+const mode = args.includes('--production') ? 'start' : 'dev';
 const child = spawn(process.execPath, [root + 'node_modules/next/dist/bin/next',
-  'dev', root + 'apps/web', '--webpack', '--hostname', host, '--port', port], { stdio: 'inherit' });
+  mode, root + 'apps/web', ...(mode === 'dev' ? ['--webpack'] : []),
+  '--hostname', host, '--port', port], { stdio: 'inherit' });
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => child.kill(signal));
 child.on('exit', code => process.exit(code ?? 0));
 child.on('error', error => { console.error(error.message); process.exit(1); });

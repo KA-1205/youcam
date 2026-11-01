@@ -1,6 +1,7 @@
 /** Run against an isolated local stack; no key or image bytes are logged. */
 import { createRequire } from 'node:module';
 import { spawn } from 'node:child_process';
+import assert from 'node:assert/strict';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 const port = process.env.ANCHOR_BROWSER_PORT ?? '3017';
@@ -46,6 +47,31 @@ try {
   const cors = await page.request.fetch('http://127.0.0.1:8017/api/sessions', { method: 'OPTIONS', headers: { Origin: origin, 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'content-type,idempotency-key' }});
   console.log('CORS_PROBE', cors.status(), await cors.text());
   console.log('HOME', await page.title());
+  for (const [occasion, title] of [['Evening', 'Out after hours'], ['Workday', 'A little more polished'], ['Everyday', 'The everyday edit']]) {
+    await page.getByRole('button', { name: occasion, exact: true }).click();
+    await page.getByRole('heading', { name: title, exact: true }).waitFor();
+  }
+  const example = page.locator('#example');
+  await page.getByLabel('New-spend budget').selectOption('2500');
+  await example.getByText('Finishing hoops', { exact: true }).waitFor();
+  assert.ok((await example.innerText()).includes('₹2,100'));
+  await page.getByLabel('New-spend budget').selectOption('1500');
+  await example.getByText('Finishing hoops', { exact: true }).waitFor({ state: 'detached' });
+  assert.ok((await example.innerText()).includes('₹1,400'));
+  for (const [name, heading] of [['Makeup', 'YouCam Makeup'], ['Jewellery', 'YouCam jewellery & watch APIs'], ['Hair colour', 'YouCam Hair Color'], ['Clothes', 'YouCam Clothes V4']]) {
+    await page.getByRole('group', { name: 'YouCam features', exact: true }).getByRole('button', { name: new RegExp(name) }).click();
+    await page.getByRole('heading', { name: heading, exact: true }).waitFor();
+    await page.locator('#capability-detail img').evaluate(img => img.decode());
+  }
+  await page.locator('summary').filter({ hasText: 'Do I have to upload a photo?' }).focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await page.locator('details').filter({ hasText: 'Do I have to upload a photo?' }).getAttribute('open'), '');
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `Overflow at ${width}px`);
+  }
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  console.log('SHOWCASE_INTERACTIONS_PASSED');
   console.log('BUTTONS', await page.getByRole('button').allTextContents());
   if (!['live', 'commerce'].includes(process.env.ANCHOR_BROWSER_RUN)) {
     console.log('TEXT', (await page.locator('main').innerText()).slice(-2200));
