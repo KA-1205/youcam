@@ -48,6 +48,7 @@ def test_worker_restart_polls_once_without_resubmission(client, db_url, monkeypa
     from apps.api.main import create_app
     from apps.worker.runtime import build_runtime
     with TestClient(create_app(db_url), base_url='https://testserver') as browser:
+        assert browser.get('/readyz').json()['liveProvidersEnabled'] is True
         session, asset = setup_ready_client(browser)
         job = enqueue_preview(browser, session, asset, capability='HAIR_COLOR', selections=[],
                               settings={'preset': 'Burgundy'}).json()

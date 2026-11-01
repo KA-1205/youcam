@@ -171,7 +171,7 @@ class LiveRunner:
                 raise
             receipt.next_poll_at = clock.now() + timedelta(seconds=30)
             db.commit()
-            return 'RUNNING' 
+            return 'RUNNING'
         revalidate()  # Consent, cancellation and session may have changed during I/O.
         child.result_asset_id = self.store_result(db, job.tenant_id, job.actor_id,
                                                   child.capability, data)

@@ -174,3 +174,27 @@ jobs:
       - run: docker build -f infra/backend.Dockerfile -t anchor-fit-backend .
       - run: docker run --rm anchor-fit-backend .venv/bin/python -m apps.worker.main --check
       - run: docker build -f infra/web.Dockerfile -t anchor-fit-web .
+  browser:
+    name: browser
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_TRANSPORT: live
+      NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:8017
+      LIVE_PROVIDERS_ENABLED: 'false'
+      ANCHOR_BROWSER_RUN: commerce
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install uv==0.13.4
+      - run: uv sync --frozen
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Browser session checkout and order recovery
+        run: DATABASE_URL="sqlite:///$RUNNER_TEMP/browser.db" npm run test:browser

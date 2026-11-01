@@ -1,4 +1,4 @@
-.PHONY: install check test api mock worker web build contracts
+.PHONY: install check test api mock worker web build contracts dev
 install:
 	uv sync --frozen
 	npm ci
@@ -27,3 +27,6 @@ worker:
 	uv run python -m tools.local worker
 web:
 	uv run python -m tools.local web
+
+dev:
+	uv run python -m tools.local dev

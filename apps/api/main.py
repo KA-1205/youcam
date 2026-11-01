@@ -682,7 +682,8 @@ def create_app(database_url: str | None = None) -> FastAPI:
                 connected = revision == '0009_live_delivery'
         except Exception:
             connected = False
-        return {'ready': connected, 'database': connected, 'liveProvidersEnabled': False}
+        return {'ready': connected, 'database': connected,
+                'liveProvidersEnabled': bool(preview_service._enabled_live)}
 
     @app.exception_handler(ApiError)
     async def domain_error(request: Request, exc: ApiError) -> JSONResponse:
